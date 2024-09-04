@@ -150,7 +150,7 @@ function dynamic_post_type_submission_form($atts) {
             'post_title' => $title,
             'post_content' => $description,
             'post_status' => 'draft',
-            'post_type' => 'childcare'
+            'post_type' => 'dynamic_post_type'
         ), true);
 
         // Check for errors
@@ -158,12 +158,18 @@ function dynamic_post_type_submission_form($atts) {
             return '<div class="dynamic_post_type-submission-error">Es ist ein Fehler beim Senden Ihres Beitrags aufgetreten. Bitte versuchen Sie es später erneut.</div>';
         }
 
-        // Add the custom fields
-        update_post_meta($post_id, 'childcare_address', $address);
-        update_post_meta($post_id, 'childcare_phone', $phone);
-        update_post_meta($post_id, 'childcare_email', $email);
-        update_post_meta($post_id, 'childcare_hours', $hours);
-        update_post_meta($post_id, 'childcare_website', $website);
+        // Load the template and insert it into the post content
+        ob_start();
+        include 'gpt-content-template.php'; // Hier wird eine eigene Template-Datei geladen
+        $template_html = ob_get_clean();
+
+        // Update post content with template
+        $post_content = get_post_field('post_content', $post_id);
+        $updated_content = $post_content . $template_html;
+        wp_update_post(array(
+            'ID' => $post_id,
+            'post_content' => $updated_content
+        ));
 
         // Display a success message
         return '<div class="dynamic_post_type-submission-success">Ihr Beitrag wurde erfolgreich eingereicht und befindet sich nun in der Überprüfung.</div>';
@@ -180,7 +186,3 @@ function dynamic_post_type_submission_form($atts) {
 
     return $form;
 }
-
-
-
-
