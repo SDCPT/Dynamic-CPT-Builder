@@ -2,21 +2,30 @@
 /**
  * Plugin Name: Dynamic CPT
  * Plugin URI: https://github.com/VolkanSah/Dynamic-CPT/
- * Description: Ermöglicht Benutzern, Einträge für Kinder- und Jugendhilfe-Anbieter über ein Frontend-Formular einzureichen. Nutze shortcode [childcare_submission]
+ * Description: Allows users to submit entries for child and youth welfare providers via a frontend form. Use shortcode [childcare_submission]
  * Version: 1.0
  * Author: Volkan Sah
  * Author URI: https://github.com/VolkanSah/
+ * Text Domain: dynamic-cpt
+ * Domain Path: /languages
  */
-// If this file is called directly, abort.
+
+// Abort if this file is called directly
 if ( ! defined( 'WPINC' ) ) {
-	die;
+    die;
 }
 
-// Tabellenname definieren
-global $wpdb;
-$table_name = $wpdb->prefix . 'childcare_entries'; // Hier wird ein Tabellenname mit dem WordPress-Präfix erstellt
+// Load plugin text domain for translations
+function dynamic_cpt_load_textdomain() {
+    load_plugin_textdomain( 'dynamic-cpt', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+}
+add_action( 'plugins_loaded', 'dynamic_cpt_load_textdomain' );
 
-// Tabelle bei der Aktivierung erstellen
+// Define the table name
+global $wpdb;
+$table_name = $wpdb->prefix . 'dynamic_cpt_entries';
+
+// Create the table on plugin activation
 function dynamic_post_create_database_table() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'dynamic_cpt_entries';
@@ -39,26 +48,27 @@ function dynamic_post_create_database_table() {
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     dbDelta( $sql );
 }
-register_activation_hook( __FILE__, 'dynamic_cpt_database_table' );
+register_activation_hook( __FILE__, 'dynamic_post_create_database_table' );
 
+// Register the custom post type
 function register_dynamic_post_type() {
     $portal_settings = get_option('current_portal_settings', array());
 
-    // Labels anpassen je nach Portal
+    // Adjust labels based on portal settings
     $labels = array(
-        'name'                  => !empty($portal_settings['post_type_name']) ? $portal_settings['post_type_name'] : 'Einträge',
-        'singular_name'         => !empty($portal_settings['singular_name']) ? $portal_settings['singular_name'] : 'Eintrag',
-        'menu_name'             => !empty($portal_settings['menu_name']) ? $portal_settings['menu_name'] : 'Eintrags-Verwaltung',
-        'name_admin_bar'        => !empty($portal_settings['name_admin_bar']) ? $portal_settings['name_admin_bar'] : 'Eintrag',
-        'add_new_item'          => 'Neuen ' . (!empty($portal_settings['singular_name']) ? $portal_settings['singular_name'] : 'Eintrag') . ' hinzufügen',
-        'edit_item'             => 'Edit Post',
-        'view_item'             => 'View Post',
-        'all_items'             => 'All Posts',
+        'name'                  => !empty($portal_settings['post_type_name']) ? esc_html($portal_settings['post_type_name']) : __('Entries', 'dynamic-cpt'),
+        'singular_name'         => !empty($portal_settings['singular_name']) ? esc_html($portal_settings['singular_name']) : __('Entry', 'dynamic-cpt'),
+        'menu_name'             => !empty($portal_settings['menu_name']) ? esc_html($portal_settings['menu_name']) : __('Entry Management', 'dynamic-cpt'),
+        'name_admin_bar'        => !empty($portal_settings['name_admin_bar']) ? esc_html($portal_settings['name_admin_bar']) : __('Entry', 'dynamic-cpt'),
+        'add_new_item'          => __('Add New', 'dynamic-cpt') . ' ' . (!empty($portal_settings['singular_name']) ? esc_html($portal_settings['singular_name']) : __('Entry', 'dynamic-cpt')),
+        'edit_item'             => __('Edit Entry', 'dynamic-cpt'),
+        'view_item'             => __('View Entry', 'dynamic-cpt'),
+        'all_items'             => __('All Entries', 'dynamic-cpt'),
     );
 
     $args = array(
-        'label'                 => !empty($portal_settings['post_type_name']) ? $portal_settings['post_type_name'] : 'Einträge',
-        'description'           => 'Dynamic Entries',
+        'label'                 => !empty($portal_settings['post_type_name']) ? esc_html($portal_settings['post_type_name']) : __('Entries', 'dynamic-cpt'),
+        'description'           => __('Dynamic Entries', 'dynamic-cpt'),
         'labels'                => $labels,
         'supports'              => array( 'title', 'editor', 'custom-fields' ),
         'hierarchical'          => false,
@@ -79,10 +89,11 @@ function register_dynamic_post_type() {
 }
 add_action('init', 'register_dynamic_post_type');
 
+// Portal settings page
 function portal_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Portal-Einstellungen</h1>
+        <h1><?php _e('Portal Settings', 'dynamic-cpt'); ?></h1>
         <form method="post" action="options.php">
             <?php
             settings_fields('portal_settings_group');
@@ -91,15 +102,15 @@ function portal_settings_page() {
             ?>
             <table class="form-table">
                 <tr valign="top">
-                    <th scope="row">Post Type Name</th>
+                    <th scope="row"><?php _e('Post Type Name', 'dynamic-cpt'); ?></th>
                     <td><input type="text" name="current_portal_settings[post_type_name]" value="<?php echo isset($settings['post_type_name']) ? esc_attr($settings['post_type_name']) : ''; ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Singular Name</th>
+                    <th scope="row"><?php _e('Singular Name', 'dynamic-cpt'); ?></th>
                     <td><input type="text" name="current_portal_settings[singular_name]" value="<?php echo isset($settings['singular_name']) ? esc_attr($settings['singular_name']) : ''; ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Menu Name</th>
+                    <th scope="row"><?php _e('Menu Name', 'dynamic-cpt'); ?></th>
                     <td><input type="text" name="current_portal_settings[menu_name]" value="<?php echo isset($settings['menu_name']) ? esc_attr($settings['menu_name']) : ''; ?>" /></td>
                 </tr>
             </table>
@@ -110,38 +121,38 @@ function portal_settings_page() {
 }
 
 function portal_settings_menu() {
-    add_menu_page('Portal Einstellungen', 'Portal-Einstellungen', 'manage_options', 'portal-settings', 'portal_settings_page');
+    add_menu_page(__('Portal Settings', 'dynamic-cpt'), __('Portal Settings', 'dynamic-cpt'), 'manage_options', 'portal-settings', 'portal_settings_page');
 }
 
 add_action('admin_menu', 'portal_settings_menu');
 
-// Einstellungen registrieren
+// Register portal settings
 function register_portal_settings() {
     register_setting('portal_settings_group', 'current_portal_settings');
 }
 add_action('admin_init', 'register_portal_settings');
 
-
+// Frontend form for submission
 function dynamic_post_type_submission_form($atts) {
     global $wpdb;
 
-    // Tabellenname für die dynamischen Einträge
+    // Table name for dynamic entries
     $table_name = $wpdb->prefix . 'dynamic_cpt_entries';
 
-    // Definiere die Formularfelder
+    // Define form fields
     $fields = array(
-        'title' => 'Name',
-        'address' => 'Adresse',
-        'phone' => 'Telefonnummer',
-        'email' => 'E-Mail-Adresse',
-        'hours' => 'Öffnungszeiten',
-        'description' => 'Beschreibung',
-        'website' => 'Website-URL'
+        'title' => __('Name', 'dynamic-cpt'),
+        'address' => __('Address', 'dynamic-cpt'),
+        'phone' => __('Phone Number', 'dynamic-cpt'),
+        'email' => __('Email Address', 'dynamic-cpt'),
+        'hours' => __('Opening Hours', 'dynamic-cpt'),
+        'description' => __('Description', 'dynamic-cpt'),
+        'website' => __('Website URL', 'dynamic-cpt')
     );
 
-    // Überprüfen, ob das Formular gesendet wurde
+    // Check if the form was submitted
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Formulardaten säubern und validieren
+        // Sanitize and validate form data
         $title = sanitize_text_field($_POST['title']);
         $address = sanitize_text_field($_POST['address']);
         $phone = sanitize_text_field($_POST['phone']);
@@ -150,7 +161,7 @@ function dynamic_post_type_submission_form($atts) {
         $description = sanitize_textarea_field($_POST['description']);
         $website = esc_url_raw($_POST['website']);
 
-        // Speichere die Daten in der Datenbank
+        // Insert data into the database
         $wpdb->insert(
             $table_name,
             array(
@@ -161,26 +172,26 @@ function dynamic_post_type_submission_form($atts) {
                 'hours' => $hours,
                 'description' => $description,
                 'website' => $website,
-                'created_at' => current_time('mysql') // Speichere das aktuelle Datum und die Zeit
+                'created_at' => current_time('mysql') // Save current timestamp
             )
         );
 
-        // Überprüfe, ob die Daten korrekt gespeichert wurden
+        // Check for database insertion errors
         if ($wpdb->last_error) {
-            return '<div class="dynamic_post_type-submission-error">Es ist ein Fehler beim Speichern Ihres Beitrags aufgetreten. Bitte versuchen Sie es später erneut.</div>';
+            return '<div class="dynamic_post_type-submission-error">' . __('An error occurred while saving your entry. Please try again.', 'dynamic-cpt') . '</div>';
         }
 
-        // Erfolgsmeldung anzeigen
-        return '<div class="dynamic_post_type-submission-success">Ihr Beitrag wurde erfolgreich eingereicht und befindet sich nun in der Überprüfung.</div>';
+        // Show success message
+        return '<div class="dynamic_post_type-submission-success">' . __('Your entry has been successfully submitted and is under review.', 'dynamic-cpt') . '</div>';
     }
 
-    // Das Formular anzeigen
+    // Display the form
     $form = '<form method="post" class="dynamic_post_type-submission-form">';
     foreach ($fields as $name => $label) {
-        $form .= '<label for="' . $name . '">' . $label . '</label>';
+        $form .= '<label for="' . $name . '">' . esc_html($label) . '</label>';
         $form .= '<input type="text" id="' . $name . '" name="' . $name . '" required>';
     }
-    $form .= '<button type="submit">Absenden</button>';
+    $form .= '<button type="submit">' . __('Submit', 'dynamic-cpt') . '</button>';
     $form .= '</form>';
 
     return $form;
