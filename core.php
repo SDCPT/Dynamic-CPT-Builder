@@ -123,7 +123,12 @@ add_action('admin_init', 'register_portal_settings');
 
 
 function dynamic_post_type_submission_form($atts) {
-    // Define the form fields
+    global $wpdb;
+
+    // Tabellenname für die dynamischen Einträge
+    $table_name = $wpdb->prefix . 'dynamic_cpt_entries';
+
+    // Definiere die Formularfelder
     $fields = array(
         'title' => 'Name',
         'address' => 'Adresse',
@@ -134,9 +139,9 @@ function dynamic_post_type_submission_form($atts) {
         'website' => 'Website-URL'
     );
 
-    // Check if the form was submitted
+    // Überprüfen, ob das Formular gesendet wurde
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Sanitize and validate the form data
+        // Formulardaten säubern und validieren
         $title = sanitize_text_field($_POST['title']);
         $address = sanitize_text_field($_POST['address']);
         $phone = sanitize_text_field($_POST['phone']);
@@ -145,37 +150,31 @@ function dynamic_post_type_submission_form($atts) {
         $description = sanitize_textarea_field($_POST['description']);
         $website = esc_url_raw($_POST['website']);
 
-        // Create a new post
-        $post_id = wp_insert_post(array(
-            'post_title' => $title,
-            'post_content' => $description,
-            'post_status' => 'draft',
-            'post_type' => 'dynamic_post_type'
-        ), true);
+        // Speichere die Daten in der Datenbank
+        $wpdb->insert(
+            $table_name,
+            array(
+                'title' => $title,
+                'address' => $address,
+                'phone' => $phone,
+                'email' => $email,
+                'hours' => $hours,
+                'description' => $description,
+                'website' => $website,
+                'created_at' => current_time('mysql') // Speichere das aktuelle Datum und die Zeit
+            )
+        );
 
-        // Check for errors
-        if (is_wp_error($post_id)) {
-            return '<div class="dynamic_post_type-submission-error">Es ist ein Fehler beim Senden Ihres Beitrags aufgetreten. Bitte versuchen Sie es später erneut.</div>';
+        // Überprüfe, ob die Daten korrekt gespeichert wurden
+        if ($wpdb->last_error) {
+            return '<div class="dynamic_post_type-submission-error">Es ist ein Fehler beim Speichern Ihres Beitrags aufgetreten. Bitte versuchen Sie es später erneut.</div>';
         }
 
-        // Load the template and insert it into the post content
-        ob_start();
-        include 'gpt-content-template.php'; // Hier wird eine eigene Template-Datei geladen
-        $template_html = ob_get_clean();
-
-        // Update post content with template
-        $post_content = get_post_field('post_content', $post_id);
-        $updated_content = $post_content . $template_html;
-        wp_update_post(array(
-            'ID' => $post_id,
-            'post_content' => $updated_content
-        ));
-
-        // Display a success message
+        // Erfolgsmeldung anzeigen
         return '<div class="dynamic_post_type-submission-success">Ihr Beitrag wurde erfolgreich eingereicht und befindet sich nun in der Überprüfung.</div>';
     }
 
-    // Display the form
+    // Das Formular anzeigen
     $form = '<form method="post" class="dynamic_post_type-submission-form">';
     foreach ($fields as $name => $label) {
         $form .= '<label for="' . $name . '">' . $label . '</label>';
