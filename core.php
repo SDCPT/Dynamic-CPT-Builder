@@ -112,8 +112,7 @@ function register_dynamic_post_type() {
 
 // Hook the function to the 'init' action
 add_action('init', 'register_dynamic_post_type');
-
-// Portal settings page
+// portal setting spage
 function portal_settings_page() {
     ?>
     <div class="wrap">
@@ -136,6 +135,56 @@ function portal_settings_page() {
                 <tr valign="top">
                     <th scope="row"><?php _e('Menu Name', 'dynamic-cpt'); ?></th>
                     <td><input type="text" name="current_portal_settings[menu_name]" value="<?php echo isset($settings['menu_name']) ? esc_attr($settings['menu_name']) : ''; ?>" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e('Slug', 'dynamic-cpt'); ?></th>
+                    <td><input type="text" name="current_portal_settings[slug]" value="<?php echo isset($settings['slug']) ? esc_attr($settings['slug']) : ''; ?>" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e('Supports', 'dynamic-cpt'); ?></th>
+                    <td>
+                        <?php
+                        $support_options = array('title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments', 'custom-fields');
+                        $current_supports = isset($settings['supports']) ? $settings['supports'] : array();
+                        foreach ($support_options as $option) {
+                            echo '<label><input type="checkbox" name="current_portal_settings[supports][]" value="' . $option . '" ' . (in_array($option, $current_supports) ? 'checked' : '') . '> ' . ucfirst($option) . '</label><br>';
+                        }
+                        ?>
+                    </td>
+                </tr>
+<tr valign="top">
+                    <th scope="row"><?php _e('REST Base', 'dynamic-cpt'); ?></th>
+                    <td><input type="text" name="current_portal_settings[rest_base]" value="<?php echo isset($settings['rest_base']) ? esc_attr($settings['rest_base']) : ''; ?>" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e('Menu Icon', 'dynamic-cpt'); ?></th>
+                    <td><input type="text" name="current_portal_settings[menu_icon]" value="<?php echo isset($settings['menu_icon']) ? esc_attr($settings['menu_icon']) : ''; ?>" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e('Capability Type', 'dynamic-cpt'); ?></th>
+                    <td>
+                        <select name="current_portal_settings[capability_type]">
+                            <option value="post" <?php selected(isset($settings['capability_type']) && $settings['capability_type'] == 'post'); ?>><?php _e('Post', 'dynamic-cpt'); ?></option>
+                            <option value="page" <?php selected(isset($settings['capability_type']) && $settings['capability_type'] == 'page'); ?>><?php _e('Page', 'dynamic-cpt'); ?></option>
+                            <option value="custom" <?php selected(isset($settings['capability_type']) && $settings['capability_type'] == 'custom'); ?>><?php _e('Custom', 'dynamic-cpt'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e('Map Meta Cap', 'dynamic-cpt'); ?></th>
+                    <td><input type="checkbox" name="current_portal_settings[map_meta_cap]" value="1" <?php checked(isset($settings['map_meta_cap']) && $settings['map_meta_cap']); ?> /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e('Taxonomies', 'dynamic-cpt'); ?></th>
+                    <td>
+                        <?php
+                        $taxonomy_options = get_taxonomies(array('public' => true), 'names');
+                        $current_taxonomies = isset($settings['taxonomies']) ? $settings['taxonomies'] : array();
+                        foreach ($taxonomy_options as $taxonomy) {
+                            echo '<label><input type="checkbox" name="current_portal_settings[taxonomies][]" value="' . $taxonomy . '" ' . (in_array($taxonomy, $current_taxonomies) ? 'checked' : '') . '> ' . $taxonomy . '</label><br>';
+                        }
+                        ?>
+                    </td>
                 </tr>
             </table>
             <?php submit_button(); ?>
