@@ -50,11 +50,17 @@ function dynamic_post_create_database_table() {
 }
 register_activation_hook( __FILE__, 'dynamic_post_create_database_table' );
 
-// Register the custom post type
+/**
+ * Register a dynamic custom post type.
+ *
+ * This function creates a custom post type with settings that can be dynamically
+ * adjusted based on the values stored in the 'current_portal_settings' option.
+ */
 function register_dynamic_post_type() {
+    // Retrieve the current portal settings
     $portal_settings = get_option('current_portal_settings', array());
 
-    // Adjust labels based on portal settings
+    // Define the labels for the custom post type
     $labels = array(
         'name'                  => !empty($portal_settings['post_type_name']) ? esc_html($portal_settings['post_type_name']) : __('Entries', 'dynamic-cpt'),
         'singular_name'         => !empty($portal_settings['singular_name']) ? esc_html($portal_settings['singular_name']) : __('Entry', 'dynamic-cpt'),
@@ -64,13 +70,16 @@ function register_dynamic_post_type() {
         'edit_item'             => __('Edit Entry', 'dynamic-cpt'),
         'view_item'             => __('View Entry', 'dynamic-cpt'),
         'all_items'             => __('All Entries', 'dynamic-cpt'),
+        'search_items'          => __('Search', 'dynamic-cpt') . ' ' . (!empty($portal_settings['post_type_name']) ? esc_html($portal_settings['post_type_name']) : __('Entries', 'dynamic-cpt')),
+        'not_found'             => __('No entries found', 'dynamic-cpt'),
+        'not_found_in_trash'    => __('No entries found in Trash', 'dynamic-cpt'),
     );
 
+    // Define the arguments for registering the custom post type
     $args = array(
         'label'                 => !empty($portal_settings['post_type_name']) ? esc_html($portal_settings['post_type_name']) : __('Entries', 'dynamic-cpt'),
         'description'           => __('Dynamic Entries', 'dynamic-cpt'),
         'labels'                => $labels,
-        'supports'              => array( 'title', 'editor', 'custom-fields' ),
         'hierarchical'          => false,
         'public'                => true,
         'show_ui'               => true,
@@ -79,14 +88,29 @@ function register_dynamic_post_type() {
         'show_in_admin_bar'     => true,
         'show_in_nav_menus'     => true,
         'can_export'            => true,
-        'has_archive'           => true,
+        'has_archive'           => !empty($portal_settings['has_archive']) && $portal_settings['has_archive'] !== 'false',
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
-        'capability_type'       => 'post',
+        'capability_type'       => !empty($portal_settings['capability_type']) ? $portal_settings['capability_type'] : 'post',
+        'rewrite'               => array(
+            'slug'                  => !empty($portal_settings['slug']) ? sanitize_title($portal_settings['slug']) : 'entries',
+            'with_front'            => true,
+            'pages'                 => true,
+            'feeds'                 => true,
+        ),
+        'supports'              => !empty($portal_settings['supports']) ? $portal_settings['supports'] : array('title', 'editor', 'custom-fields'),
+        'taxonomies'            => !empty($portal_settings['taxonomies']) ? $portal_settings['taxonomies'] : array(),
+        'show_in_rest'          => true,
+        'rest_base'             => !empty($portal_settings['rest_base']) ? $portal_settings['rest_base'] : 'entries',
+        'menu_icon'             => !empty($portal_settings['menu_icon']) ? esc_url($portal_settings['menu_icon']) : 'dashicons-admin-post',
+        'map_meta_cap'          => !empty($portal_settings['map_meta_cap']) && $portal_settings['map_meta_cap'] !== 'false',
     );
 
-    register_post_type( 'dynamic_post_type', $args );
+    // Register the custom post type
+    register_post_type('dynamic_post_type', $args);
 }
+
+// Hook the function to the 'init' action
 add_action('init', 'register_dynamic_post_type');
 
 // Portal settings page
