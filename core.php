@@ -3,7 +3,7 @@
  * Plugin Name: Dynamic CPT
  * Plugin URI: https://github.com/VolkanSah/Dynamic-CPT/
  * Description: Allows users to submit entries for child and youth welfare providers via a frontend form. Use shortcode [childcare_submission]
- * Version: 1.0
+ * Version: 1.3
  * Author: Volkan Sah
  * Author URI: https://github.com/VolkanSah/
  * Text Domain: dynamic-cpt
