@@ -208,6 +208,29 @@ function portal_settings_page() {
     </div>
     <?php
 }
+function save_portal_settings() {
+    register_setting('portal_settings_group', 'current_portal_settings', 'sanitize_portal_settings');
+}
+add_action('admin_init', 'save_portal_settings');
+
+function sanitize_portal_settings($input) {
+    $sanitized_input = array();
+    
+    // Sanitize each setting
+    $sanitized_input['post_type_name'] = sanitize_text_field($input['post_type_name']);
+    $sanitized_input['singular_name'] = sanitize_text_field($input['singular_name']);
+    $sanitized_input['menu_name'] = sanitize_text_field($input['menu_name']);
+    $sanitized_input['slug'] = sanitize_title($input['slug']);
+    $sanitized_input['supports'] = isset($input['supports']) ? array_map('sanitize_text_field', $input['supports']) : array();
+    $sanitized_input['rest_base'] = sanitize_text_field($input['rest_base']);
+    $sanitized_input['menu_icon'] = sanitize_text_field($input['menu_icon']);
+    $sanitized_input['capability_type'] = sanitize_text_field($input['capability_type']);
+    $sanitized_input['map_meta_cap'] = isset($input['map_meta_cap']) ? 1 : 0;
+    $sanitized_input['taxonomies'] = isset($input['taxonomies']) ? array_map('sanitize_text_field', $input['taxonomies']) : array();
+    $sanitized_input['has_archive'] = isset($input['has_archive']) ? 1 : 0;
+
+    return $sanitized_input;
+}
 
 function portal_settings_menu() {
     add_menu_page(__('Portal Settings', 'dynamic-cpt'), __('Portal Settings', 'dynamic-cpt'), 'manage_options', 'portal-settings', 'portal_settings_page');
