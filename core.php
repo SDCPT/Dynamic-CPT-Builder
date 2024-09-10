@@ -81,7 +81,7 @@ function register_dynamic_post_type() {
         'description'           => __('Dynamic Entries', 'dynamic-cpt'),
         'labels'                => $labels,
         'hierarchical'          => false,
-        'has_archive' => !empty($portal_settings['has_archive']) && $portal_settings['has_archive'] !== 'false',
+        'has_archive' => isset($portal_settings['has_archive']) ? (bool) $portal_settings['has_archive'] : true,
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'public'                => true,
@@ -91,7 +91,6 @@ function register_dynamic_post_type() {
         'show_in_admin_bar'     => true,
         'show_in_nav_menus'     => true,
         'can_export'            => true,
-        'has_archive'           => !empty($portal_settings['has_archive']) && $portal_settings['has_archive'] !== 'false',
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'capability_type'       => !empty($portal_settings['capability_type']) ? $portal_settings['capability_type'] : 'post',
@@ -205,6 +204,14 @@ function portal_settings_page() {
                         ?>
                     </td>
                 </tr>
+                <tr valign="top">
+    <th scope="row"><?php _e('Enable Archive', 'dynamic-cpt'); ?></th>
+    <td>
+        <input type="checkbox" name="current_portal_settings[has_archive]" value="1" <?php checked(isset($settings['has_archive']) ? $settings['has_archive'] : 1); ?> />
+        <label for="has_archive"><?php _e('Enable archive for this CPT', 'dynamic-cpt'); ?></label>
+    </td>
+</tr>
+
             </table>
             <?php submit_button(); ?>
         </form>
