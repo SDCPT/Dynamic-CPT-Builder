@@ -21,35 +21,6 @@ function dynamic_cpt_load_textdomain() {
 }
 add_action( 'plugins_loaded', 'dynamic_cpt_load_textdomain' );
 
-// Define the table name
-global $wpdb;
-$table_name = $wpdb->prefix . 'dynamic_cpt_entries';
-
-// Create the table on plugin activation
-function dynamic_post_create_database_table() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'dynamic_cpt_entries';
-    
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $sql = "CREATE TABLE $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        title varchar(255) NOT NULL,
-        address text NOT NULL,
-        phone varchar(20) NOT NULL,
-        email varchar(100) NOT NULL,
-        hours text NOT NULL,
-        description longtext NOT NULL,
-        website varchar(255) DEFAULT '' NOT NULL,
-        created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        PRIMARY KEY (id)
-    ) $charset_collate;";
-
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-    dbDelta( $sql );
-}
-register_activation_hook( __FILE__, 'dynamic_post_create_database_table' );
-
 /**
  * Register a dynamic custom post type.
  *
