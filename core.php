@@ -81,7 +81,7 @@ function register_dynamic_post_type() {
         'description'           => __('Dynamic Entries', 'dynamic-cpt'),
         'labels'                => $labels,
         'hierarchical'          => false,
-        'has_archive'           => true,
+        'has_archive' => !empty($portal_settings['has_archive']) && $portal_settings['has_archive'] !== 'false',
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'public'                => true,
