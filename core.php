@@ -182,10 +182,14 @@ function portal_settings_page() {
                         </select>
                     </td>
                 </tr>
-                <tr valign="top">
-                    <th scope="row"><?php _e('Map Meta Cap', 'dynamic-cpt'); ?></th>
-                    <td><input type="checkbox" name="current_portal_settings[map_meta_cap]" value="1" <?php checked(isset($settings['map_meta_cap']) && $settings['map_meta_cap']); ?> /></td>
-                </tr>
+<tr valign="top">
+    <th scope="row"><?php _e('Automatic Permission Mapping', 'dynamic-cpt'); ?></th>
+    <td>
+        <input type="checkbox" name="current_portal_settings[map_meta_cap]" value="1" <?php checked(isset($settings['map_meta_cap']) && $settings['map_meta_cap']); ?> />
+        <label for="map_meta_cap"><?php _e('Enable (recommended)', 'dynamic-cpt'); ?></label>
+        <p class="description"><?php _e('Allows WordPress to automatically manage permissions for this Custom Post Type.', 'dynamic-cpt'); ?></p>
+    </td>
+</tr>
                 <tr valign="top">
                     <th scope="row"><?php _e('Taxonomies', 'dynamic-cpt'); ?></th>
                     <td>
