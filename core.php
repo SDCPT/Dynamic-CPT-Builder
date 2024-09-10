@@ -153,13 +153,25 @@ function portal_settings_page() {
                     </td>
                 </tr>
 <tr valign="top">
-                    <th scope="row"><?php _e('REST Base', 'dynamic-cpt'); ?></th>
-                    <td><input type="text" name="current_portal_settings[rest_base]" value="<?php echo isset($settings['rest_base']) ? esc_attr($settings['rest_base']) : ''; ?>" /></td>
-                </tr>
-                <tr valign="top">
-                    <th scope="row"><?php _e('Menu Icon', 'dynamic-cpt'); ?></th>
-                    <td><input type="text" name="current_portal_settings[menu_icon]" value="<?php echo isset($settings['menu_icon']) ? esc_attr($settings['menu_icon']) : ''; ?>" /></td>
-                </tr>
+    <th scope="row"><?php _e('REST API Endpoint', 'dynamic-cpt'); ?></th>
+    <td>
+        <input type="text" name="current_portal_settings[rest_base]" value="<?php echo isset($settings['rest_base']) ? esc_attr($settings['rest_base']) : ''; ?>" />
+        <p class="description"><?php _e('Optional: Custom endpoint for REST API. Leave blank to use the post type name.', 'dynamic-cpt'); ?></p>
+    </td>
+</tr>
+<tr valign="top">
+    <th scope="row"><?php _e('Menu Icon', 'dynamic-cpt'); ?></th>
+    <td>
+        <select name="current_portal_settings[menu_icon]">
+            <option value="dashicons-admin-post" <?php selected(isset($settings['menu_icon']) ? $settings['menu_icon'] : '', 'dashicons-admin-post'); ?>><?php _e('Default Post', 'dynamic-cpt'); ?></option>
+            <option value="dashicons-admin-page" <?php selected(isset($settings['menu_icon']) ? $settings['menu_icon'] : '', 'dashicons-admin-page'); ?>><?php _e('Page', 'dynamic-cpt'); ?></option>
+            <option value="dashicons-database" <?php selected(isset($settings['menu_icon']) ? $settings['menu_icon'] : '', 'dashicons-database'); ?>><?php _e('Database', 'dynamic-cpt'); ?></option>
+            <option value="dashicons-cart" <?php selected(isset($settings['menu_icon']) ? $settings['menu_icon'] : '', 'dashicons-cart'); ?>><?php _e('Cart', 'dynamic-cpt'); ?></option>
+            <option value="dashicons-products" <?php selected(isset($settings['menu_icon']) ? $settings['menu_icon'] : '', 'dashicons-products'); ?>><?php _e('Products', 'dynamic-cpt'); ?></option>
+            <option value="dashicons-admin-users" <?php selected(isset($settings['menu_icon']) ? $settings['menu_icon'] : '', 'dashicons-admin-users'); ?>><?php _e('Users', 'dynamic-cpt'); ?></option>
+        </select>
+    </td>
+</tr>
                 <tr valign="top">
                     <th scope="row"><?php _e('Capability Type', 'dynamic-cpt'); ?></th>
                     <td>
