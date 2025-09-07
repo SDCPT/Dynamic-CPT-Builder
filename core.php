@@ -3,7 +3,7 @@
 Plugin Name: Multi Secure Dynamic CPT
 Description: Create multiple dynamic custom post types with individual field configurations
 Version: 2.0
-Author: VolkanSah
+Author: Volkansah
 */
 
 // Security check
