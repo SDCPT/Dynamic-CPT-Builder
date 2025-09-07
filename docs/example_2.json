@@ -1,0 +1,73 @@
+{
+    "title": {
+        "label": "Name ",
+        "type": "text",
+        "required": true
+    },
+    "content": {
+        "label": "Profil-Beschreibung",
+        "type": "textarea",
+        "required": false
+    },
+    "email": {
+        "label": "Kontakt-E-Mail",
+        "type": "email",
+        "required": true
+    },
+    "phone": {
+        "label": "Telefonnummer",
+        "type": "tel",
+        "required": false
+    },
+    "website": {
+        "label": "Portfolio-URL",
+        "type": "url",
+        "required": false
+    },
+    "languages": {
+        "label": "Programmiersprachen",
+        "type": "select",
+        "multiple": true,
+        "options": [
+            {
+                "value": "php",
+                "label": "PHP"
+            },
+            {
+                "value": "js",
+                "label": "JavaScript"
+            },
+            {
+                "value": "py",
+                "label": "Python"
+            },
+            {
+                "value": "java",
+                "label": "Java"
+            },
+            {
+                "value": "cpp",
+                "label": "C++"
+            },
+            {
+                "value": "rust",
+                "label": "Rust"
+            }
+        ],
+        "required": true
+    },
+    "skills": {
+        "label": "Frameworks",
+        "type": "textarea"
+    },
+    "available": {
+        "label": "Momentan verfügbar für neue Projekte?",
+        "type": "checkbox",
+        "options": [
+            {
+                "value": "1",
+                "label": "Ja"
+            }
+        ]
+    }
+}
