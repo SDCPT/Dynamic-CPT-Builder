@@ -1,7 +1,7 @@
 # Secure & Dynamic CPT Builder
 
 > [!IMPORTANT]
-> dev status! build it new and better! Works fine :) 
+> dev status! build it new and better! Works fine , till yet 😄
 
 **Secure & Dynamic CPT Builder** is a WordPress plugin that allows developers and administrators to create custom post types dynamically from the admin panel, with a strong focus on security and data integrity.
 
