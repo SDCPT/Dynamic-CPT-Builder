@@ -2,7 +2,7 @@
 ##### Rebuild of my Plugin from 2022 for more security and now for free
 
 > [!IMPORTANT]  
-> Dev status! Rebuild! New and better stuff! Works fine till now!
+> Dev status! Rebuild! New and better stuff! Works fine till yet! 😃
 
 > [!NOTE]
 > I use another way to create this slim dynamic CPT. While I don't have much time, I'm updating it as I need it myself. I don't want this slim plugin to die - if you want to contribute and have time, I would be glad if you help extend this plugin together. It will always stay free for all, but please no bloat!
