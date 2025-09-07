@@ -2,8 +2,8 @@
 ##### Rebuild of my Plugin from 2022 for more security and now for free
 
 > [!IMPORTANT]
-> dev status! build it new and better! Works fine , till yet!
-> WILL STAY ALLWAYS OPENSOURCE Slim & FREE 4 ALL 🥳
+> dev status! rebuild! new and better stuff! Works fine , till yet!
+> WILL STAY ALLWAYS OPENSOURCE SLIM & FREE 4 ALL 🥳
 
 **Secure & Dynamic CPT Builder** is a WordPress plugin that allows developers and administrators to create custom post types dynamically from the admin panel, with a strong focus on security and data integrity.
 
