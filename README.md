@@ -1,5 +1,9 @@
 # Secure Custom Post Types
 
+#### known errors
+- delete cpt
+- manage db entries
+
 **Secure CPT** is a WordPress plugin that allows you to create **custom post types dynamically** with fully customizable form fields, while implementing strong security measures.
 
 ## Features
