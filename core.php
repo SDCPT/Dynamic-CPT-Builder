@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
 //     $plugin = new MultiSecureDynamicCPT();
 //     return $content . $plugin->display_entry_meta_on_frontend($content);
 // });
+
 // soon
 // Define plugin constants
 //define('SDCPT_PATH', plugin_dir_path(__FILE__));
@@ -28,6 +29,10 @@ if (!defined('ABSPATH')) {
 //require_once SDCPT_PATH . 'modules/export.php';
 //require_once SDCPT_PATH . 'modules/import.php';
 //require_once SDCPT_PATH . 'modules/advanced-fields.php';
+
+
+
+// soon end
 
 class MultiSecureDynamicCPT {
 
