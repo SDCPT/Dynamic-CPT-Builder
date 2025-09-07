@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Multi Secure Dynamic CPTs
  * Description: A plugin to create dynamic CPTs with secure form submission to a custom database table.
- * Version: 1.0.2
+ * Version: 1.0.4
  * Author: Volkan Kücükbudak
  */
 
