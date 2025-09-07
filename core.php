@@ -19,6 +19,15 @@ if (!defined('ABSPATH')) {
 //     $plugin = new MultiSecureDynamicCPT();
 //     return $content . $plugin->display_entry_meta_on_frontend($content);
 // });
+// soon
+// Define plugin constants
+//define('SDCPT_PATH', plugin_dir_path(__FILE__));
+//define('SDCPT_URL', plugin_dir_url(__FILE__));
+
+// Load modules
+//require_once SDCPT_PATH . 'modules/export.php';
+//require_once SDCPT_PATH . 'modules/import.php';
+//require_once SDCPT_PATH . 'modules/advanced-fields.php';
 
 class MultiSecureDynamicCPT {
 
@@ -800,19 +809,46 @@ class MultiSecureDynamicCPT {
                         $required = !empty($field_config['required']) ? ' required' : '';
                         $attributes = 'name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '"' . $required;
                         switch ($field_type) {
-                            case 'textarea':
-                                echo '<textarea ' . $attributes . '></textarea>';
-                                break;
-                            case 'email':
-                            case 'url':
-                            case 'tel':
-                            case 'number':
-                                echo '<input type="' . esc_attr($field_type) . '" ' . $attributes . '>';
-                                break;
-                            default:
-                                echo '<input type="text" ' . $attributes . '>';
-                                break;
-                        }
+    case 'textarea':
+        echo '<textarea ' . $attributes . '></textarea>';
+        break;
+    case 'select':
+        echo '<select ' . $attributes;
+        if (!empty($field_config['multiple'])) {
+            echo ' multiple';
+            $attributes .= '[]'; // Add array notation for multiple select
+        }
+        echo '>';
+        if (!empty($field_config['options'])) {
+            foreach ($field_config['options'] as $option) {
+                echo '<option value="' . esc_attr($option['value']) . '">' . 
+                     esc_html($option['label']) . '</option>';
+            }
+        }
+        echo '</select>';
+        break;
+    case 'checkbox':
+        if (!empty($field_config['options'])) {
+            foreach ($field_config['options'] as $option) {
+                echo '<label class="checkbox-label">';
+                echo '<input type="checkbox" name="' . esc_attr($field_name) . 
+                     '" value="' . esc_attr($option['value']) . '"' . 
+                     $required . '> ';
+                echo esc_html($option['label']);
+                echo '</label>';
+            }
+        }
+        break;
+    case 'email':
+    case 'url':
+    case 'tel':
+    case 'number':
+        echo '<input type="' . esc_attr($field_type) . '" ' . $attributes . '>';
+        break;
+    default:
+        echo '<input type="text" ' . $attributes . '>';
+        break;
+}
                         ?>
                     </div>
                 <?php endforeach; ?>
@@ -896,6 +932,28 @@ class MultiSecureDynamicCPT {
             .secure-cpt-form button:hover {
                 background-color: #005177;
             }
+
+            .secure-cpt-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.secure-cpt-form select[multiple] {
+    height: auto;
+    min-height: 120px;
+}
+
+.secure-cpt-form .checkbox-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.secure-cpt-form input[type="checkbox"] {
+    margin-right: 5px;
+}
         </style>
         <?php
         return ob_get_clean();
@@ -930,7 +988,18 @@ class MultiSecureDynamicCPT {
         $meta_data = [];
 
         foreach ($form_fields as $key => $config) {
-            $value = isset($_POST[$key]) ? sanitize_text_field(wp_unslash($_POST[$key])) : '';
+
+            if (isset($_POST[$key])) {
+    if (is_array($_POST[$key])) {
+        // Handle multiple values (e.g., multiple select)
+        $value = array_map('sanitize_text_field', wp_unslash($_POST[$key]));
+        $value = json_encode($value); // Store multiple values as JSON
+    } else {
+        $value = sanitize_text_field(wp_unslash($_POST[$key]));
+    }
+} else {
+    $value = '';
+}
             if (!empty($config['required']) && empty($value)) {
                 wp_send_json_error(['message' => ($config['label'] ?? $key) . ' is required.'], 400);
             }
