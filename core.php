@@ -1,17 +1,16 @@
 <?php
 /*
 Plugin Name: Multi Secure Dynamic CPT
-Description: Create multiple dynamic custom post types with individual field configurations
-Version: 2.2
+Description: Create multiple dynamic custom post types with individual field configurations (secure and PDO-based).
+Version: 2.3
 Author: Volkansah
 */
 
-// Security check
+// Security
 if (!defined('WPINC')) {
     die;
 }
 
-// Aktivierungs-/Deaktivierungs-Hooks sollten außerhalb der Klasse registriert werden.
 register_activation_hook(__FILE__, ['MultiSecureDynamicCPT', 'plugin_activation']);
 register_deactivation_hook(__FILE__, ['MultiSecureDynamicCPT', 'plugin_deactivation']);
 
@@ -34,13 +33,14 @@ class MultiSecureDynamicCPT {
         add_action('wp_ajax_nopriv_secure_cpt_submit', [$this, 'ajax_form_submit']);
         add_action('wp_ajax_secure_cpt_submit', [$this, 'ajax_form_submit']);
 
+        // Metaboxes & save hook for WP posts created from entries
+        add_action('add_meta_boxes', [$this, 'add_custom_meta_boxes']);
+        add_action('save_post', [$this, 'save_custom_meta_data']);
+
         add_shortcode('secure_cpt_form', [$this, 'render_frontend_form']);
         add_shortcode('secure_cpt_list', [$this, 'render_entries_list']);
     }
 
-    /**
-     * Get secure PDO connection
-     */
     private function get_pdo_connection() {
         if ($this->pdo === null) {
             try {
@@ -59,40 +59,26 @@ class MultiSecureDynamicCPT {
         return $this->pdo;
     }
 
-    /**
-     * Load text domain
-     */
     public function load_textdomain() {
         load_plugin_textdomain('multi-secure-cpt', false, dirname(plugin_basename(__FILE__)) . '/languages');
     }
 
-    /**
-     * Plugin activation (static context)
-     */
     public static function plugin_activation() {
-        // Create an instance to call non-static methods
         $instance = new self();
         $instance->create_tables();
         $instance->register_all_cpts();
         flush_rewrite_rules();
     }
-    
-    /**
-     * Plugin deactivation (static context)
-     */
+
     public static function plugin_deactivation() {
         flush_rewrite_rules();
     }
 
-    /**
-     * Create database tables
-     */
     private function create_tables() {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) return false;
 
         try {
-            // CPT definitions table
             $sql1 = "CREATE TABLE IF NOT EXISTS {$this->cpt_table} (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 cpt_key VARCHAR(50) NOT NULL UNIQUE,
@@ -108,7 +94,6 @@ class MultiSecureDynamicCPT {
                 INDEX idx_key (cpt_key)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
-            // Entries table
             $sql2 = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 cpt_key VARCHAR(50) NOT NULL,
@@ -130,20 +115,15 @@ class MultiSecureDynamicCPT {
             $pdo->exec($sql1);
             $pdo->exec($sql2);
             return true;
-
         } catch (PDOException $e) {
             error_log('Multi Secure CPT Table Creation Error: ' . $e->getMessage());
             return false;
         }
     }
 
-    /**
-     * Get all CPT definitions
-     */
     private function get_all_cpts() {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) return [];
-
         try {
             $stmt = $pdo->prepare("SELECT * FROM {$this->cpt_table} WHERE is_active = 1");
             $stmt->execute();
@@ -154,9 +134,6 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * Register all active CPTs
-     */
     public function register_all_cpts() {
         $cpts = $this->get_all_cpts();
         foreach ($cpts as $cpt) {
@@ -164,9 +141,6 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * Register single CPT
-     */
     private function register_single_cpt($cpt_data) {
         $settings = json_decode($cpt_data['settings'] ?? '{}', true);
         $labels = [
@@ -199,9 +173,6 @@ class MultiSecureDynamicCPT {
         register_post_type($cpt_data['cpt_key'], $args);
     }
 
-    /**
-     * Add admin menu
-     */
     public function add_admin_menu() {
         add_menu_page(
             __('Multi Secure CPT', 'multi-secure-cpt'),
@@ -229,16 +200,13 @@ class MultiSecureDynamicCPT {
             [$this, 'manage_entries_page']
         );
     }
-    
-    /**
-     * Main admin page
-     */
+
     public function main_admin_page() {
         $cpts = $this->get_all_cpts();
         ?>
         <div class="wrap">
             <h1><?php _e('Multi Secure Dynamic CPTs', 'multi-secure-cpt'); ?></h1>
-            
+
             <div class="cpt-manager">
                 <h2><?php _e('Create New CPT', 'multi-secure-cpt'); ?></h2>
                 <table class="form-table">
@@ -271,9 +239,9 @@ class MultiSecureDynamicCPT {
                 </table>
                 <button type="button" id="create-cpt-btn" class="button button-primary"><?php _e('Create CPT', 'multi-secure-cpt'); ?></button>
             </div>
-            
+
             <hr>
-            
+
             <h2><?php _e('Existing CPTs', 'multi-secure-cpt'); ?></h2>
             <table class="wp-list-table widefat fixed striped">
                 <thead>
@@ -296,6 +264,7 @@ class MultiSecureDynamicCPT {
                             <td>
                                 <a href="<?php echo admin_url('edit.php?post_type=' . $cpt['cpt_key']); ?>" class="button"><?php _e('View WP Posts', 'multi-secure-cpt'); ?></a>
                                 <a href="<?php echo admin_url('admin.php?page=multi-secure-cpt-entries&cpt=' . $cpt['cpt_key']); ?>" class="button"><?php _e('View DB Entries', 'multi-secure-cpt'); ?></a>
+                                <button class="button show-shortcode-btn" data-cpt="<?php echo esc_attr($cpt['cpt_key']); ?>"><?php _e('Show Shortcode', 'multi-secure-cpt'); ?></button>
                                 <button class="button button-link-delete delete-cpt-btn" data-cpt="<?php echo esc_attr($cpt['cpt_key']); ?>"><?php _e('Delete', 'multi-secure-cpt'); ?></button>
                             </td>
                         </tr>
@@ -303,7 +272,7 @@ class MultiSecureDynamicCPT {
                 </tbody>
             </table>
         </div>
-        
+
         <script>
         jQuery(document).ready(function($) {
             $('#load-default-fields').click(function() {
@@ -325,7 +294,7 @@ class MultiSecureDynamicCPT {
                         return;
                     }
                 }
-                
+
                 var data = {
                     action: 'create_new_cpt',
                     cpt_key: $('#new-cpt-key').val(),
@@ -335,31 +304,38 @@ class MultiSecureDynamicCPT {
                     form_fields: jsonText,
                     _wpnonce: '<?php echo wp_create_nonce('create_cpt_nonce'); ?>'
                 };
-                
+
                 $.post(ajaxurl, data, function(response) {
                     if (response.success) {
                         location.reload();
                     } else {
-                        alert('Error: ' + response.data);
+                        alert('Error: ' + (response.data || 'Unknown error'));
                     }
                 });
             });
-            
+
+            $('.show-shortcode-btn').click(function() {
+                var cptKey = $(this).data('cpt');
+                var formShortcode = '[secure_cpt_form cpt="' + cptKey + '"]';
+                var listShortcode = '[secure_cpt_list cpt="' + cptKey + '"]';
+                alert('Form Shortcode:\n' + formShortcode + '\n\nList Shortcode:\n' + listShortcode);
+            });
+
             $('.delete-cpt-btn').click(function() {
-                if (!confirm('<?php _e('Are you sure? This will delete the CPT and all associated database entries!', 'multi-secure-cpt'); ?>')) return;
-                
+                if (!confirm('<?php _e('Are you sure? This will delete the CPT and all associated database entries and WP posts!', 'multi-secure-cpt'); ?>')) return;
+
                 var cpt_key = $(this).data('cpt');
                 var data = {
                     action: 'delete_cpt',
                     cpt_key: cpt_key,
                     _wpnonce: '<?php echo wp_create_nonce('delete_cpt_nonce'); ?>'
                 };
-                
+
                 $.post(ajaxurl, data, function(response) {
                     if (response.success) {
                         location.reload();
                     } else {
-                        alert('Error: ' + response.data);
+                        alert('Error: ' + (response.data || 'Unknown error'));
                     }
                 });
             });
@@ -368,9 +344,6 @@ class MultiSecureDynamicCPT {
         <?php
     }
 
-    /**
-     * Get entry count for CPT
-     */
     private function get_entry_count($cpt_key) {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) return 0;
@@ -384,14 +357,6 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * AJAX: Create new CPT
-     *
-     * Behavior:
-     * - If cpt_key exists and is_active = 1 -> error (duplicate)
-     * - If cpt_key exists and is_active = 0 -> UPDATE the record and set is_active = 1
-     * - Else -> INSERT new record
-     */
     public function ajax_create_cpt() {
         if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_cpt_nonce') || !current_user_can('manage_options')) {
             wp_send_json_error('Security check failed', 403);
@@ -406,20 +371,14 @@ class MultiSecureDynamicCPT {
         $cpt_name = sanitize_text_field($_POST['cpt_name'] ?? '');
         $cpt_singular = sanitize_text_field($_POST['cpt_singular'] ?? '');
         $cpt_slug = sanitize_title($_POST['cpt_slug'] ?? '');
-        
-        // JSON-String von Slashes bereinigen
         $form_fields = wp_unslash($_POST['form_fields'] ?? '');
 
         if (empty($cpt_key) || empty($cpt_name) || empty($cpt_singular) || empty($cpt_slug)) {
             wp_send_json_error('All fields are required.');
         }
-
-        // Limit key length to match DB
         if (strlen($cpt_key) > 50) {
             wp_send_json_error('CPT Key too long (max 50 characters).');
         }
-
-        // Validate JSON
         if (!empty($form_fields)) {
             json_decode($form_fields);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -429,8 +388,6 @@ class MultiSecureDynamicCPT {
 
         try {
             $pdo->beginTransaction();
-
-            // Prüfe vorhandenen Eintrag
             $check = $pdo->prepare("SELECT id, is_active FROM {$this->cpt_table} WHERE cpt_key = ?");
             $check->execute([$cpt_key]);
             $existing = $check->fetch();
@@ -440,7 +397,6 @@ class MultiSecureDynamicCPT {
                     $pdo->rollBack();
                     wp_send_json_error('CPT key already exists and is active.');
                 } else {
-                    // Wieder aktivieren / updaten
                     $upd = $pdo->prepare("UPDATE {$this->cpt_table} SET cpt_name = ?, cpt_singular = ?, cpt_slug = ?, form_fields = ?, is_active = 1, updated_at = NOW() WHERE cpt_key = ?");
                     $res = $upd->execute([$cpt_name, $cpt_singular, $cpt_slug, $form_fields, $cpt_key]);
                     if (!$res) {
@@ -454,7 +410,7 @@ class MultiSecureDynamicCPT {
             } else {
                 $stmt = $pdo->prepare("INSERT INTO {$this->cpt_table} (cpt_key, cpt_name, cpt_singular, cpt_slug, form_fields) VALUES (?, ?, ?, ?, ?)");
                 $result = $stmt->execute([$cpt_key, $cpt_name, $cpt_singular, $cpt_slug, $form_fields]);
-                
+
                 if ($result) {
                     $pdo->commit();
                     flush_rewrite_rules();
@@ -471,37 +427,23 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * AJAX: Delete CPT
-     *
-     * Verhalten:
-     * - Löscht alle Einträge in der entries-Tabelle für cpt_key
-     * - Löscht zugehörige WP-Posts (sofern vorhanden)
-     * - Löscht den CPT-Eintrag in der cpt_table
-     * - Alles in einer Transaction
-     */
     public function ajax_delete_cpt() {
         if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'delete_cpt_nonce') || !current_user_can('manage_options')) {
             wp_send_json_error('Security check failed', 403);
-        }
-        $pdo = $this->get_pdo_connection();
-        if (!$pdo) {
-            wp_send_json_error('Database connection failed');
         }
         $cpt_key = sanitize_key($_POST['cpt_key'] ?? '');
         if (empty($cpt_key)) {
             wp_send_json_error('Invalid CPT key.');
         }
+        $pdo = $this->get_pdo_connection();
+        if (!$pdo) {
+            wp_send_json_error('Database connection failed');
+        }
 
         try {
             $pdo->beginTransaction();
 
-            // 1) lösche Einträge in eigener Tabelle
-            $stmtEntries = $pdo->prepare("DELETE FROM {$this->table_name} WHERE cpt_key = ?");
-            $stmtEntries->execute([$cpt_key]);
-
-            // 2) lösche zugehörige WP-Posts (inkl. Meta)
-            // Hol die Post-IDs aus unserer Tabelle (falls wp_post_id gesetzt) und zusätzlich aus WP falls nötig
+            // 1) Sammle Post-IDs aus eigener Tabelle BEVOR du löschen
             $postIds = [];
             $stmtPosts = $pdo->prepare("SELECT wp_post_id FROM {$this->table_name} WHERE cpt_key = ? AND wp_post_id IS NOT NULL");
             $stmtPosts->execute([$cpt_key]);
@@ -510,37 +452,40 @@ class MultiSecureDynamicCPT {
                 if (!empty($r['wp_post_id'])) $postIds[] = (int)$r['wp_post_id'];
             }
 
-            // zusätzlich: falls keine wp_post_id, dann suche WP-Posts mit diesem post_type
+            // 2) Sammle WP-Post IDs nach post_type
             $wp_query = new WP_Query([
                 'post_type' => $cpt_key,
                 'post_status' => 'any',
                 'fields' => 'ids',
                 'posts_per_page' => -1,
             ]);
-            if ($wp_query && !is_wp_error($wp_query) && $wp_query->have_posts()) {
+            if ($wp_query && !is_wp_error($wp_query)) {
                 foreach ($wp_query->posts as $pid) {
                     $postIds[] = (int)$pid;
                 }
             }
 
-            // dedupe
             $postIds = array_values(array_unique($postIds));
 
+            // 3) Lösche Einträge aus eigener Tabelle
+            $stmtEntries = $pdo->prepare("DELETE FROM {$this->table_name} WHERE cpt_key = ?");
+            $stmtEntries->execute([$cpt_key]);
+
+            // 4) Lösche WP-Posts (force delete)
             if (!empty($postIds)) {
                 foreach ($postIds as $pid) {
-                    // force delete to remove from WP completely
-                    wp_delete_post($pid, true);
+                    if ($pid && get_post($pid)) {
+                        wp_delete_post($pid, true);
+                    }
                 }
             }
 
-            // 3) delete CPT row
+            // 5) Lösche CPT-Definition
             $stmt = $pdo->prepare("DELETE FROM {$this->cpt_table} WHERE cpt_key = ?");
             $result = $stmt->execute([$cpt_key]);
 
             if ($result) {
                 $pdo->commit();
-                // Hinweis: unregister_post_type ist nicht zuverlässig in allen Kontexten.
-                // flush rewrite rules damit alte slugs weg sind
                 flush_rewrite_rules();
                 wp_send_json_success('CPT deleted successfully');
             } else {
@@ -550,32 +495,28 @@ class MultiSecureDynamicCPT {
         } catch (Exception $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();
             error_log('Multi Secure CPT Delete Error: ' . $e->getMessage());
-            wp_send_json_error('Database error during delete');
+            wp_send_json_error('Database error: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Manage entries page
-     */
     public function manage_entries_page() {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) {
             echo '<div class="error"><p>' . __('Database connection failed.', 'multi-secure-cpt') . '</p></div>';
             return;
         }
-        
+
         $current_cpt = isset($_GET['cpt']) ? sanitize_key($_GET['cpt']) : '';
         $cpts = $this->get_all_cpts();
-        
-        // Handle status updates
+
         if (isset($_POST['action']) && $_POST['action'] === 'update_status' && isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'update_entry_status')) {
             $this->update_entry_status((int)$_POST['entry_id'], sanitize_text_field($_POST['status']));
         }
-        
+
         ?>
         <div class="wrap">
             <h1><?php _e('Manage All Entries', 'multi-secure-cpt'); ?></h1>
-            
+
             <div class="cpt-filter">
                 <form method="get">
                     <input type="hidden" name="page" value="multi-secure-cpt-entries">
@@ -589,17 +530,17 @@ class MultiSecureDynamicCPT {
                     </select>
                 </form>
             </div>
-            
+
             <?php
             try {
                 $where_clause = $current_cpt ? "WHERE cpt_key = ?" : "";
                 $params = $current_cpt ? [$current_cpt] : [];
-                
+
                 $stmt = $pdo->prepare("SELECT * FROM {$this->table_name} {$where_clause} ORDER BY created_at DESC LIMIT 100");
                 $stmt->execute($params);
                 $entries = $stmt->fetchAll();
                 ?>
-                
+
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
@@ -658,9 +599,6 @@ class MultiSecureDynamicCPT {
         <?php
     }
 
-    /**
-     * Update entry status
-     */
     private function update_entry_status($entry_id, $status) {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) return false;
@@ -671,12 +609,11 @@ class MultiSecureDynamicCPT {
         try {
             $stmt = $pdo->prepare("UPDATE {$this->table_name} SET status = ?, updated_at = NOW() WHERE id = ?");
             $result = $stmt->execute([$status, $entry_id]);
-            
-            // When published, create/update WP post
+
             if ($result && $status === 'published') {
                 $this->create_wp_post_from_entry($entry_id);
             }
-            
+
             return true;
         } catch (PDOException $e) {
             error_log('Multi Secure CPT Update Error: ' . $e->getMessage());
@@ -684,9 +621,6 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * Create WP post from entry
-     */
     private function create_wp_post_from_entry($entry_id) {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) return false;
@@ -700,7 +634,7 @@ class MultiSecureDynamicCPT {
 
             $post_id = $entry['wp_post_id'];
             $meta_data = json_decode($entry['meta_data'], true);
-            
+
             $post_data = [
                 'post_title'    => sanitize_text_field($entry['title']),
                 'post_content'  => wp_kses_post($entry['content']),
@@ -731,25 +665,22 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * Render frontend form
-     */
     public function render_frontend_form($atts) {
         $atts = shortcode_atts(['cpt' => ''], $atts, 'secure_cpt_form');
         if (empty($atts['cpt'])) return '<p>'.__('CPT parameter missing.', 'multi-secure-cpt').'</p>';
-        
+
         $cpt_data = $this->get_cpt_by_key($atts['cpt']);
         if (!$cpt_data) return '<p>'.__('CPT not found.', 'multi-secure-cpt').'</p>';
-        
+
         $form_fields = json_decode($cpt_data['form_fields'] ?? '{}', true);
         if (empty($form_fields)) return '<p>'.__('No form fields configured.', 'multi-secure-cpt').'</p>';
-        
+
         ob_start();
         ?>
         <div id="secure-cpt-form-container-<?php echo esc_attr($atts['cpt']); ?>">
             <form class="secure-cpt-form" data-cpt="<?php echo esc_attr($atts['cpt']); ?>" onsubmit="submitSecureCptForm(event)">
                 <?php wp_nonce_field('secure_cpt_form_' . $atts['cpt'], 'secure_cpt_nonce'); ?>
-                
+
                 <?php foreach ($form_fields as $field_name => $field_config): ?>
                     <div class="form-field">
                         <label for="<?php echo esc_attr($field_name); ?>">
@@ -791,7 +722,7 @@ class MultiSecureDynamicCPT {
             var formData = new FormData(form);
             formData.append('action', 'secure_cpt_submit');
             formData.append('cpt_key', form.dataset.cpt);
-            
+
             fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
                 method: 'POST',
                 body: formData
@@ -822,10 +753,7 @@ class MultiSecureDynamicCPT {
         <?php
         return ob_get_clean();
     }
-    
-    /**
-     * Get CPT definition by key
-     */
+
     private function get_cpt_by_key($cpt_key) {
         $pdo = $this->get_pdo_connection();
         if (!$pdo) return null;
@@ -838,9 +766,6 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * AJAX: Handle form submission
-     */
     public function ajax_form_submit() {
         $cpt_key = isset($_POST['cpt_key']) ? sanitize_key($_POST['cpt_key']) : '';
         if (empty($cpt_key) || !isset($_POST['secure_cpt_nonce']) || !wp_verify_nonce($_POST['secure_cpt_nonce'], 'secure_cpt_form_' . $cpt_key)) {
@@ -856,7 +781,7 @@ class MultiSecureDynamicCPT {
         $title = '';
         $content = '';
         $meta_data = [];
-        
+
         foreach ($form_fields as $key => $config) {
             $value = isset($_POST[$key]) ? sanitize_text_field(wp_unslash($_POST[$key])) : '';
             if (!empty($config['required']) && empty($value)) {
@@ -870,7 +795,7 @@ class MultiSecureDynamicCPT {
                 $meta_data[$key] = $value;
             }
         }
-        
+
         if (empty($title)) {
             $title = 'Submission from ' . date('Y-m-d H:i');
         }
@@ -897,9 +822,6 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    /**
-     * Render entries list
-     */
     public function render_entries_list($atts) {
         $atts = shortcode_atts(['cpt' => ''], $atts, 'secure_cpt_list');
         if (empty($atts['cpt'])) return '<p>'.__('CPT parameter missing.', 'multi-secure-cpt').'</p>';
@@ -914,7 +836,7 @@ class MultiSecureDynamicCPT {
         if (!$query->have_posts()) {
             return '<p>'.__('No entries found.', 'multi-secure-cpt').'</p>';
         }
-        
+
         ob_start();
         echo '<div class="secure-cpt-list">';
         while ($query->have_posts()) {
@@ -928,7 +850,98 @@ class MultiSecureDynamicCPT {
         wp_reset_postdata();
         return ob_get_clean();
     }
+
+    // ---------- Metaboxes & save handlers ----------
+    public function add_custom_meta_boxes() {
+        $cpts = $this->get_all_cpts();
+        foreach ($cpts as $cpt) {
+            add_meta_box(
+                $cpt['cpt_key'] . '_custom_fields',
+                __('Additional Fields', 'multi-secure-cpt'),
+                [$this, 'render_custom_meta_box'],
+                $cpt['cpt_key'],
+                'normal',
+                'high'
+            );
+        }
+    }
+
+    public function render_custom_meta_box($post) {
+        $cpt_key = $post->post_type;
+        $entry = $this->get_entry_by_post_id($post->ID);
+
+        if (!$entry) {
+            echo '<p>' . __('No linked secure entry found.', 'multi-secure-cpt') . '</p>';
+            return;
+        }
+
+        $meta_data = json_decode($entry['meta_data'], true);
+        $cpt_data = $this->get_cpt_by_key($cpt_key);
+        if (!$cpt_data) return;
+        $form_fields = json_decode($cpt_data['form_fields'], true);
+
+        wp_nonce_field('save_custom_meta', 'custom_meta_nonce');
+
+        foreach ($form_fields as $field_name => $field_config) {
+            if ($field_name === 'title' || $field_name === 'content') continue;
+            $value = $meta_data[$field_name] ?? '';
+            ?>
+            <div class="form-field" style="margin-bottom:10px;">
+                <label for="<?php echo esc_attr($field_name); ?>">
+                    <strong><?php echo esc_html($field_config['label'] ?? $field_name); ?></strong>
+                </label>
+                <?php if (($field_config['type'] ?? 'text') === 'textarea'): ?>
+                    <textarea name="<?php echo esc_attr($field_name); ?>" id="<?php echo esc_attr($field_name); ?>" class="widefat" rows="4"><?php echo esc_textarea($value); ?></textarea>
+                <?php else: ?>
+                    <input type="text" name="<?php echo esc_attr($field_name); ?>" id="<?php echo esc_attr($field_name); ?>" value="<?php echo esc_attr($value); ?>" class="widefat">
+                <?php endif; ?>
+            </div>
+            <?php
+        }
+    }
+
+    public function save_custom_meta_data($post_id) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (!isset($_POST['custom_meta_nonce']) || !wp_verify_nonce($_POST['custom_meta_nonce'], 'save_custom_meta')) return;
+        if (!current_user_can('edit_post', $post_id)) return;
+
+        $cpt_key = get_post_type($post_id);
+        $cpt_data = $this->get_cpt_by_key($cpt_key);
+        if (!$cpt_data) return;
+
+        $form_fields = json_decode($cpt_data['form_fields'], true);
+        $meta_data = [];
+
+        foreach ($form_fields as $field_name => $field_config) {
+            if ($field_name === 'title' || $field_name === 'content') continue;
+            if (isset($_POST[$field_name])) {
+                $meta_data[$field_name] = sanitize_text_field(wp_unslash($_POST[$field_name]));
+            }
+        }
+
+        $pdo = $this->get_pdo_connection();
+        if ($pdo) {
+            try {
+                $stmt = $pdo->prepare("UPDATE {$this->table_name} SET meta_data = ?, updated_at = NOW() WHERE wp_post_id = ?");
+                $stmt->execute([json_encode($meta_data), $post_id]);
+            } catch (PDOException $e) {
+                error_log('Error saving custom meta: ' . $e->getMessage());
+            }
+        }
+    }
+
+    private function get_entry_by_post_id($post_id) {
+        $pdo = $this->get_pdo_connection();
+        if (!$pdo) return null;
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM {$this->table_name} WHERE wp_post_id = ?");
+            $stmt->execute([$post_id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+    // ---------- end metaboxes ----------
 }
 
-// Plugin starten
 new MultiSecureDynamicCPT();
