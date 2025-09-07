@@ -3,8 +3,6 @@
 
 > [!IMPORTANT]  
 > Dev status! Rebuild! New and better stuff! Works fine till now!
->
-> WILL STAY ALWAYS OPENSOURCE SLIM & FREE 4 ALL 🥳
 
 > [!NOTE]
 > I use another way to create this slim dynamic CPT. While I don't have much time, I'm updating it as I need it myself. I don't want this slim plugin to die - if you want to contribute and have time, I would be glad if you help extend this plugin together. It will always stay free for all, but please no bloat!
