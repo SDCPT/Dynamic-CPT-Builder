@@ -3,7 +3,7 @@
 Plugin Name: Multi Secure Dynamic CPT
 Description: Create multiple dynamic custom post types with individual field configurations
 Version: 2.0
-Author: Volkan Sah
+Author: VolkanSah
 */
 
 // Security check
@@ -312,14 +312,109 @@ class MultiSecureDynamicCPT {
         
         <script>
         jQuery(document).ready(function($) {
+            // JSON Examples
+            var jsonExamples = {
+                restaurant: {
+                    "name": {"type": "text", "label": "Restaurant Name", "required": true},
+                    "address": {"type": "text", "label": "Address", "required": true},
+                    "phone": {"type": "tel", "label": "Phone", "required": false},
+                    "website": {"type": "url", "label": "Website", "required": false},
+                    "description": {"type": "textarea", "label": "Description", "required": false}
+                },
+                business: {
+                    "company_name": {"type": "text", "label": "Company Name", "required": true},
+                    "contact_email": {"type": "email", "label": "Contact Email", "required": true},
+                    "services": {"type": "textarea", "label": "Services", "required": true}
+                },
+                event: {
+                    "event_title": {"type": "text", "label": "Event Title", "required": true},
+                    "event_date": {"type": "text", "label": "Event Date", "required": true},
+                    "location": {"type": "text", "label": "Location", "required": true},
+                    "organizer_email": {"type": "email", "label": "Organizer Email", "required": true}
+                }
+            };
+            
+            // Validate JSON button
+            $('#validate-json-btn').click(function() {
+                var jsonText = $('#new-cpt-fields').val();
+                var status = $('#json-status');
+                
+                if (!jsonText.trim()) {
+                    status.html('<span style="color: orange;">Please enter JSON to validate</span>');
+                    return;
+                }
+                
+                try {
+                    var parsed = JSON.parse(jsonText);
+                    status.html('<span style="color: green;">✓ Valid JSON!</span>');
+                    console.log('Parsed JSON:', parsed);
+                } catch (e) {
+                    status.html('<span style="color: red;">✗ Invalid JSON: ' + e.message + '</span>');
+                }
+            });
+            
+            // Load example JSON
+            $('#example-json-btn').click(function() {
+                var examples = Object.keys(jsonExamples);
+                var choice = prompt('Choose example:\n1. restaurant\n2. business\n3. event\n\nEnter number or name:');
+                
+                var selectedExample;
+                if (choice === '1' || choice.toLowerCase() === 'restaurant') {
+                    selectedExample = jsonExamples.restaurant;
+                } else if (choice === '2' || choice.toLowerCase() === 'business') {
+                    selectedExample = jsonExamples.business;
+                } else if (choice === '3' || choice.toLowerCase() === 'event') {
+                    selectedExample = jsonExamples.event;
+                } else {
+                    selectedExample = jsonExamples.restaurant; // Default
+                }
+                
+                $('#new-cpt-fields').val(JSON.stringify(selectedExample, null, 2));
+                $('#json-status').html('<span style="color: blue;">Example loaded</span>');
+            });
+            
+            // Auto-validate on input
+            $('#new-cpt-fields').on('input', function() {
+                var jsonText = $(this).val();
+                var status = $('#json-status');
+                
+                if (!jsonText.trim()) {
+                    status.empty();
+                    return;
+                }
+                
+                try {
+                    JSON.parse(jsonText);
+                    status.html('<span style="color: green;">✓ Valid</span>');
+                } catch (e) {
+                    status.html('<span style="color: red;">✗ Invalid</span>');
+                }
+            });
+            
+            // Create CPT with better validation
             $('#create-cpt-btn').click(function() {
+                var jsonText = $('#new-cpt-fields').val();
+                
+                // Pre-validate JSON
+                if (!jsonText.trim()) {
+                    alert('Please enter form fields JSON');
+                    return;
+                }
+                
+                try {
+                    JSON.parse(jsonText);
+                } catch (e) {
+                    alert('Invalid JSON: ' + e.message);
+                    return;
+                }
+                
                 var data = {
                     action: 'create_new_cpt',
                     cpt_key: $('#new-cpt-key').val(),
                     cpt_name: $('#new-cpt-name').val(),
                     cpt_singular: $('#new-cpt-singular').val(),
                     cpt_slug: $('#new-cpt-slug').val(),
-                    form_fields: $('#new-cpt-fields').val(),
+                    form_fields: jsonText,
                     _wpnonce: '<?php echo wp_create_nonce('create_cpt_nonce'); ?>'
                 };
                 
