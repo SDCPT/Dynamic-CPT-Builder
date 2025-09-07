@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 //     $plugin = new MultiSecureDynamicCPT();
 //     return $content . $plugin->display_entry_meta_on_frontend($content);
 // });
-
+// soon
 // Define plugin constants
 //define('SDCPT_PATH', plugin_dir_path(__FILE__));
 //define('SDCPT_URL', plugin_dir_url(__FILE__));
