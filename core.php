@@ -800,19 +800,46 @@ class MultiSecureDynamicCPT {
                         $required = !empty($field_config['required']) ? ' required' : '';
                         $attributes = 'name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '"' . $required;
                         switch ($field_type) {
-                            case 'textarea':
-                                echo '<textarea ' . $attributes . '></textarea>';
-                                break;
-                            case 'email':
-                            case 'url':
-                            case 'tel':
-                            case 'number':
-                                echo '<input type="' . esc_attr($field_type) . '" ' . $attributes . '>';
-                                break;
-                            default:
-                                echo '<input type="text" ' . $attributes . '>';
-                                break;
-                        }
+    case 'textarea':
+        echo '<textarea ' . $attributes . '></textarea>';
+        break;
+    case 'select':
+        echo '<select ' . $attributes;
+        if (!empty($field_config['multiple'])) {
+            echo ' multiple';
+            $attributes .= '[]'; // Add array notation for multiple select
+        }
+        echo '>';
+        if (!empty($field_config['options'])) {
+            foreach ($field_config['options'] as $option) {
+                echo '<option value="' . esc_attr($option['value']) . '">' . 
+                     esc_html($option['label']) . '</option>';
+            }
+        }
+        echo '</select>';
+        break;
+    case 'checkbox':
+        if (!empty($field_config['options'])) {
+            foreach ($field_config['options'] as $option) {
+                echo '<label class="checkbox-label">';
+                echo '<input type="checkbox" name="' . esc_attr($field_name) . 
+                     '" value="' . esc_attr($option['value']) . '"' . 
+                     $required . '> ';
+                echo esc_html($option['label']);
+                echo '</label>';
+            }
+        }
+        break;
+    case 'email':
+    case 'url':
+    case 'tel':
+    case 'number':
+        echo '<input type="' . esc_attr($field_type) . '" ' . $attributes . '>';
+        break;
+    default:
+        echo '<input type="text" ' . $attributes . '>';
+        break;
+}
                         ?>
                     </div>
                 <?php endforeach; ?>
