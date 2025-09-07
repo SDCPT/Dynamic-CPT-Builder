@@ -923,6 +923,28 @@ class MultiSecureDynamicCPT {
             .secure-cpt-form button:hover {
                 background-color: #005177;
             }
+
+            .secure-cpt-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.secure-cpt-form select[multiple] {
+    height: auto;
+    min-height: 120px;
+}
+
+.secure-cpt-form .checkbox-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.secure-cpt-form input[type="checkbox"] {
+    margin-right: 5px;
+}
         </style>
         <?php
         return ob_get_clean();
