@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Multi Secure Dynamic CPTs
  * Description: A plugin to create dynamic CPTs with secure form submission to a custom database table.
- * Version: 1.0.1
- * Author: Your Name
+ * Version: 2.0.4
+ * Author: Volkan Kücükbudak
  */
 
 if (!defined('ABSPATH')) {
@@ -1063,19 +1063,31 @@ class MultiSecureDynamicCPT {
         if (!$cpt_data) return;
         $form_fields = json_decode($cpt_data['form_fields'], true);
         
+        $meta_data = [];
+
+        // If no entry exists, create a new one to link it to the WP post
         if (!$entry) {
-            echo '<p>' . __('This entry is not yet linked to a secure submission entry.', 'multi-secure-cpt') . '</p>';
-            if (!empty($form_fields)) {
-                echo '<h4>' . __('Defined form fields for this CPT:', 'multi-secure-cpt') . '</h4>';
-                echo '<pre>' . json_encode($form_fields, JSON_PRETTY_PRINT) . '</pre>';
+            $pdo = $this->get_pdo_connection();
+            if ($pdo) {
+                try {
+                    $stmt = $pdo->prepare("INSERT INTO {$this->table_name} (cpt_key, title, content, status, wp_post_id) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$cpt_key, $post->post_title, $post->post_content, 'published', $post->ID]);
+                    
+                    // Fetch the newly created entry
+                    $entry = $this->get_entry_by_post_id($post->ID);
+                } catch (PDOException $e) {
+                    error_log('Error creating entry for post: ' . $e->getMessage());
+                    echo '<p>' . __('Failed to create a database entry for this post. Please check the logs.', 'multi-secure-cpt') . '</p>';
+                }
             }
-            return;
+        }
+        
+        if ($entry) {
+            $meta_data = json_decode($entry['meta_data'], true);
         }
 
-        $meta_data = json_decode($entry['meta_data'], true);
-        
         wp_nonce_field('save_custom_meta', 'custom_meta_nonce');
-
+        
         foreach ($form_fields as $field_name => $field_config) {
             if ($field_name === 'title' || $field_name === 'content') continue;
             $value = $meta_data[$field_name] ?? '';
