@@ -3,7 +3,7 @@
 Plugin Name: Secure Dynamic CPT
 Description: Lightweight dynamic custom post type with PDO security approach
 Version: 1.0
-Author: Volkan Sah
+Author: Your Name
 */
 
 // Security check
@@ -505,11 +505,57 @@ class SecureDynamicCPT {
      * Cleanup on deactivation
      */
     public function cleanup() {
+        flush_rewrite_rules();
         // Optional: Remove table on deactivation
         // $pdo = $this->get_pdo_connection();
         // if ($pdo) {
         //     $pdo->exec("DROP TABLE IF EXISTS {$this->table_name}");
         // }
+    }
+    
+    /**
+     * Load single template for CPT
+     */
+    public function load_single_template($template) {
+        global $post;
+        
+        if ($post->post_type == 'secure_entry') {
+            $plugin_template = plugin_dir_path(__FILE__) . 'templates/single-secure_entry.php';
+            if (file_exists($plugin_template)) {
+                return $plugin_template;
+            }
+        }
+        return $template;
+    }
+    
+    /**
+     * Load archive template for CPT
+     */
+    public function load_archive_template($template) {
+        if (is_post_type_archive('secure_entry')) {
+            $plugin_template = plugin_dir_path(__FILE__) . 'templates/archive-secure_entry.php';
+            if (file_exists($plugin_template)) {
+                return $plugin_template;
+            }
+        }
+        return $template;
+    }
+    
+    /**
+     * Debug info for admins (only in debug mode)
+     */
+    public function debug_info() {
+        if (!WP_DEBUG || !current_user_can('manage_options')) return;
+        
+        global $wp_query;
+        
+        if (is_singular('secure_entry') || is_post_type_archive('secure_entry')) {
+            echo '<!-- Secure CPT Debug:';
+            echo ' Post Type: ' . get_post_type();
+            echo ' Query Vars: ' . print_r($wp_query->query_vars, true);
+            echo ' Rewrite Rules: ' . print_r(get_option('rewrite_rules'), true);
+            echo '-->';
+        }
     }
 }
 
