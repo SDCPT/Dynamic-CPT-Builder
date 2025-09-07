@@ -93,4 +93,4 @@ Place the following shortcode on any page or post:
 
 ## License
 
-Privat! Non-Commercial Use allowed!
+Apache 2 + notes section 4
