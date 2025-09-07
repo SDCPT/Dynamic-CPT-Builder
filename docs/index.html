@@ -26,8 +26,12 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+        #main-content {
+  display: none;
+}
     </style>
 </head>
+     <div id="main-content">
 <body class="bg-gray-50 font-sans antialiased">
     <!-- GitHub Corner -->
     <a href="https://github.com/VolkanSah/Secure-Dynamic-CPT-Builder" class="github-corner fixed right-0 top-0 z-50" aria-label="View source on GitHub">
@@ -295,5 +299,17 @@
         });
         feather.replace();
     </script>
+          </div>
+
+  <noscript>
+    <div class="no-js-message">
+      <h2>JavaScript ist deaktiviert</h2>
+      <p>Bitte aktiviere JavaScript, um diese Seite optimal nutzen zu können.</p>
+    </div>
+  </noscript>
+  
+  <script>
+    document.getElementById('main-content').style.display = 'block';
+  </script>
 </body>
 </html>
