@@ -1,4 +1,6 @@
 <?php
+
+// soon , sorry!
 if (!defined('ABSPATH')) {
     exit;
 }
