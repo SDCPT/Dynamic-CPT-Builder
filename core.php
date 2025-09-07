@@ -20,6 +20,15 @@ if (!defined('ABSPATH')) {
 //     return $content . $plugin->display_entry_meta_on_frontend($content);
 // });
 
+// Define plugin constants
+//define('SDCPT_PATH', plugin_dir_path(__FILE__));
+//define('SDCPT_URL', plugin_dir_url(__FILE__));
+
+// Load modules
+//require_once SDCPT_PATH . 'modules/export.php';
+//require_once SDCPT_PATH . 'modules/import.php';
+//require_once SDCPT_PATH . 'modules/advanced-fields.php';
+
 class MultiSecureDynamicCPT {
 
     private $db_version = '1.0';
