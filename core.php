@@ -979,7 +979,18 @@ class MultiSecureDynamicCPT {
         $meta_data = [];
 
         foreach ($form_fields as $key => $config) {
-            $value = isset($_POST[$key]) ? sanitize_text_field(wp_unslash($_POST[$key])) : '';
+
+            if (isset($_POST[$key])) {
+    if (is_array($_POST[$key])) {
+        // Handle multiple values (e.g., multiple select)
+        $value = array_map('sanitize_text_field', wp_unslash($_POST[$key]));
+        $value = json_encode($value); // Store multiple values as JSON
+    } else {
+        $value = sanitize_text_field(wp_unslash($_POST[$key]));
+    }
+} else {
+    $value = '';
+}
             if (!empty($config['required']) && empty($value)) {
                 wp_send_json_error(['message' => ($config['label'] ?? $key) . ' is required.'], 400);
             }
