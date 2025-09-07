@@ -89,7 +89,8 @@ Place the following shortcode on any page or post:
 
   * Import/Export CPT configurations.
   * Enhanced REST API support.
-  * More field types (e.g., file uploads, dates, number inputs).
+### added
+  * More field types 
 
 -----
 
