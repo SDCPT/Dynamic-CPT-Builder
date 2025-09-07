@@ -1,5 +1,5 @@
 # Secure & Dynamic CPT Builder
-##### Rebuild of my Plugin from 2022 for more security and semless
+##### Rebuild of my Plugin from 2022 for more security and now for free
 
 > [!IMPORTANT]
 > dev status! build it new and better! Works fine , till yet!
