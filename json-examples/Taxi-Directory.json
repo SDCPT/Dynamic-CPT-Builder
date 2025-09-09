@@ -1,0 +1,67 @@
+{
+    "title": {
+        "label": "Company Name",
+        "type": "text",
+        "required": true,
+        "is_title": true
+    },
+    "content": {
+        "label": "Description",
+        "type": "textarea",
+        "required": false,
+        "is_content": true
+    },
+    "phone": {
+        "label": "Phone Number",
+        "type": "tel",
+        "required": true
+    },
+    "email": {
+        "label": "Contact Email",
+        "type": "email",
+        "required": false
+    },
+    "website": {
+        "label": "Website",
+        "type": "url",
+        "required": false
+    },
+    "location": {
+        "label": "Service Area",
+        "type": "text",
+        "required": true,
+        "placeholder": "e.g., Berlin, Germany"
+    },
+    "available_24_7": {
+        "label": "24/7 Service",
+        "type": "radio",
+        "required": true,
+        "options": [
+            { "value": "yes", "label": "Yes" },
+            { "value": "no", "label": "No" }
+        ]
+    },
+    "vehicle_types": {
+        "label": "Vehicle Types",
+        "type": "select",
+        "multiple": true,
+        "required": false,
+        "options": [
+            { "value": "sedan", "label": "Sedan" },
+            { "value": "van", "label": "Van" },
+            { "value": "luxury", "label": "Luxury Car" },
+            { "value": "eco", "label": "Eco-Friendly" }
+        ]
+    },
+    "payment_methods": {
+        "label": "Payment Methods",
+        "type": "select",
+        "multiple": true,
+        "required": false,
+        "options": [
+            { "value": "cash", "label": "Cash" },
+            { "value": "card", "label": "Credit/Debit Card" },
+            { "value": "paypal", "label": "PayPal" }
+        ]
+    }
+}
