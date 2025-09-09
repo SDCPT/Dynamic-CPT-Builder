@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Multi Secure Dynamic CPTs
  * Description: A plugin to create dynamic CPTs with secure form submission to a custom database table.
- * Version: 1.0.7
+ * Version: 2.2.0
  * Author: Volkan Kücükbudak
  */
 
@@ -10,12 +10,35 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+define('SDCPT_PATH', plugin_dir_path(__FILE__));
+define('SDCPT_URL', plugin_dir_url(__FILE__));
+
 class MultiSecureDynamicCPT {
 
     private $db_version = '1.0';
     private $table_name;
     private $cpt_table;
     private $pdo = null;
+    
+    // upgrade
+    public function load_modules() {
+        global $multi_secure_cpt_plugin;
+        $multi_secure_cpt_plugin = $this;
+
+        $modules_dir = SDCPT_PATH . 'modules/';
+        if (is_dir($modules_dir)) {
+            $modules = glob($modules_dir . '*.php');
+            if (!empty($modules)) {
+                foreach ($modules as $module_file) {
+                    require_once $module_file;
+                }
+            }
+        }
+    }
+    
+    // upgrade end
+    
+    
 
     public $default_fields = [
         'title' => [
@@ -62,6 +85,9 @@ class MultiSecureDynamicCPT {
 
         add_action('add_meta_boxes', [$this, 'add_custom_meta_boxes']);
         add_action('save_post', [$this, 'save_custom_meta_data']);
+        
+        // upgrade
+        add_action('plugins_loaded', [$this, 'load_modules']);
     }
 
     public function create_tables() {
@@ -139,6 +165,14 @@ class MultiSecureDynamicCPT {
             'manage_options',
             'multi-secure-cpt-entries',
             [$this, 'manage_entries_page']
+        );
+        add_submenu_page(
+            'multi-secure-cpt',
+            __('Addons', 'multi-secure-cpt'),
+            __('Addons', 'multi-secure-cpt'),
+            'manage_options',
+            'multi-secure-cpt-addons',
+            [$this, 'addons_page']
         );
     }
 
@@ -495,6 +529,21 @@ class MultiSecureDynamicCPT {
         </style>
         <?php
     }
+    
+    
+    // upgrade
+    
+    /**
+     * Placeholder for the addons page
+     */
+    public function addons_page() {
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Multi Secure CPT Addons', 'multi-secure-cpt'); ?></h1>
+            <p><?php _e('Addons will be managed here soon.', 'multi-secure-cpt'); ?></p>
+        </div>
+        <?php
+    }
 
     /**
      * Get entry count for a CPT
@@ -530,7 +579,7 @@ class MultiSecureDynamicCPT {
         $cpt_name = sanitize_text_field($_POST['cpt_name'] ?? '');
         $cpt_singular = sanitize_text_field($_POST['cpt_singular'] ?? '');
         $cpt_slug = sanitize_title($_POST['cpt_slug'] ?? '');
-        $form_fields = wp_unslash($_POST['form_fields'] ?? '');
+        $form_fields_json = wp_unslash($_POST['form_fields'] ?? '');
 
         // Validation
         if (empty($cpt_key) || empty($cpt_name) || empty($cpt_singular) || empty($cpt_slug)) {
@@ -540,13 +589,22 @@ class MultiSecureDynamicCPT {
         if (strlen($cpt_key) > 50) {
             wp_send_json_error('CPT Key too long (max 50 characters).');
         }
-
-        if (!empty($form_fields)) {
-            json_decode($form_fields);
+        
+        $form_fields_decoded = [];
+        if (!empty($form_fields_json)) {
+            $form_fields_decoded = json_decode($form_fields_json, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 wp_send_json_error('Invalid JSON in form fields: ' . json_last_error_msg());
             }
+
+            // Handle if user pastes an array with a single object inside
+            if (is_array($form_fields_decoded) && count($form_fields_decoded) === 1 && isset($form_fields_decoded[0]) && is_array($form_fields_decoded[0])) {
+                $form_fields_decoded = $form_fields_decoded[0];
+            }
         }
+        
+        $form_fields = !empty($form_fields_decoded) ? json_encode($form_fields_decoded) : '';
+
 
         try {
             $pdo->beginTransaction();
@@ -885,47 +943,60 @@ class MultiSecureDynamicCPT {
                         <?php
                         $field_type = $field_config['type'] ?? 'text';
                         $required = !empty($field_config['required']) ? ' required' : '';
-                        $attributes = 'name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '"' . $required;
+                        $placeholder = !empty($field_config['placeholder']) ? ' placeholder="' . esc_attr($field_config['placeholder']) . '"' : '';
+                        $attributes = 'name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '"' . $required . $placeholder;
                         switch ($field_type) {
-    case 'textarea':
-        echo '<textarea ' . $attributes . '></textarea>';
-        break;
-    case 'select':
-        echo '<select ' . $attributes;
-        if (!empty($field_config['multiple'])) {
-            echo ' multiple';
-        }
-        echo '>';
-        if (!empty($field_config['options'])) {
-            foreach ($field_config['options'] as $option) {
-                echo '<option value="' . esc_attr($option['value']) . '">' . 
-                     esc_html($option['label']) . '</option>';
-            }
-        }
-        echo '</select>';
-        break;
-    case 'checkbox':
-        if (!empty($field_config['options'])) {
-            foreach ($field_config['options'] as $option) {
-                echo '<label class="checkbox-label">';
-                echo '<input type="checkbox" name="' . esc_attr($field_name) . 
-                     '[]" value="' . esc_attr($option['value']) . '"' . 
-                     $required . '> ';
-                echo esc_html($option['label']);
-                echo '</label>';
-            }
-        }
-        break;
-    case 'email':
-    case 'url':
-    case 'tel':
-    case 'number':
-        echo '<input type="' . esc_attr($field_type) . '" ' . $attributes . '>';
-        break;
-    default:
-        echo '<input type="text" ' . $attributes . '>';
-        break;
-}
+                            case 'textarea':
+                                echo '<textarea ' . $attributes . '></textarea>';
+                                break;
+                            case 'select':
+                                echo '<select ' . $attributes;
+                                if (!empty($field_config['multiple'])) {
+                                    echo ' multiple';
+                                }
+                                echo '>';
+                                if (!empty($field_config['options'])) {
+                                    foreach ($field_config['options'] as $option) {
+                                        echo '<option value="' . esc_attr($option['value']) . '">' . 
+                                             esc_html($option['label']) . '</option>';
+                                    }
+                                }
+                                echo '</select>';
+                                break;
+                            case 'checkbox':
+                                if (!empty($field_config['options'])) {
+                                    foreach ($field_config['options'] as $option) {
+                                        echo '<label class="checkbox-label">';
+                                        echo '<input type="checkbox" name="' . esc_attr($field_name) . 
+                                             '[]" value="' . esc_attr($option['value']) . '"' . 
+                                             $required . '> ';
+                                        echo esc_html($option['label']);
+                                        echo '</label>';
+                                    }
+                                }
+                                break;
+                            case 'radio':
+                                if (!empty($field_config['options'])) {
+                                    foreach ($field_config['options'] as $option) {
+                                        echo '<label class="radio-label">';
+                                        echo '<input type="radio" name="' . esc_attr($field_name) . 
+                                             '" value="' . esc_attr($option['value']) . '"' . 
+                                             $required . '> ';
+                                        echo esc_html($option['label']);
+                                        echo '</label>';
+                                    }
+                                }
+                                break;
+                            case 'email':
+                            case 'url':
+                            case 'tel':
+                            case 'number':
+                                echo '<input type="' . esc_attr($field_type) . '" ' . $attributes . '>';
+                                break;
+                            default:
+                                echo '<input type="text" ' . $attributes . '>';
+                                break;
+                        }
                         ?>
                     </div>
                 <?php endforeach; ?>
@@ -1023,12 +1094,14 @@ class MultiSecureDynamicCPT {
                 min-height: 120px;
             }
 
-            .secure-cpt-form .checkbox-label {
+            .secure-cpt-form .checkbox-label,
+            .secure-cpt-form .radio-label {
                 display: block;
                 margin-bottom: 5px;
             }
 
-            .secure-cpt-form input[type="checkbox"] {
+            .secure-cpt-form input[type="checkbox"],
+            .secure-cpt-form input[type="radio"] {
                 margin-right: 5px;
             }
         </style>
@@ -1235,6 +1308,8 @@ class MultiSecureDynamicCPT {
             
             $value = isset($meta_data[$field_name]) ? $meta_data[$field_name] : '';
             $field_type = $field_config['type'] ?? 'text';
+            $placeholder = !empty($field_config['placeholder']) ? ' placeholder="' . esc_attr($field_config['placeholder']) . '"' : '';
+
             ?>
             <div class="form-field" style="margin-bottom:10px;">
                 <label for="<?php echo esc_attr($field_name); ?>">
@@ -1242,7 +1317,7 @@ class MultiSecureDynamicCPT {
                 </label>
                 <?php switch ($field_type) {
                     case 'textarea':
-                        echo '<textarea name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '" class="widefat" rows="4">' . esc_textarea(is_array($value) ? implode(', ', $value) : $value) . '</textarea>';
+                        echo '<textarea name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '" class="widefat" rows="4"' . $placeholder . '>' . esc_textarea(is_array($value) ? implode(', ', $value) : $value) . '</textarea>';
                         break;
                     case 'select':
                         $is_multiple = !empty($field_config['multiple']);
@@ -1263,15 +1338,26 @@ class MultiSecureDynamicCPT {
                         if (!empty($field_config['options'])) {
                             foreach ($field_config['options'] as $option) {
                                 $checked = in_array($option['value'], $current_values) ? ' checked' : '';
-                                echo '<label class="checkbox-label">';
+                                echo '<label class="checkbox-label" style="display: block; margin-bottom: 5px;">';
                                 echo '<input type="checkbox" name="' . esc_attr($field_name) . '[]" value="' . esc_attr($option['value']) . '"' . $checked . '> ';
                                 echo esc_html($option['label']);
                                 echo '</label>';
                             }
                         }
                         break;
+                    case 'radio':
+                        if (!empty($field_config['options'])) {
+                            foreach ($field_config['options'] as $option) {
+                                $checked = ($value === $option['value']) ? ' checked' : '';
+                                echo '<label class="radio-label" style="display: block; margin-bottom: 5px;">';
+                                echo '<input type="radio" name="' . esc_attr($field_name) . '" value="' . esc_attr($option['value']) . '"' . $checked . '> ';
+                                echo esc_html($option['label']);
+                                echo '</label>';
+                            }
+                        }
+                        break;
                     default: // text, email, url, tel, number
-                        echo '<input type="' . esc_attr($field_type) . '" name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '" value="' . esc_attr(is_array($value) ? implode(', ', $value) : $value) . '" class="widefat">';
+                        echo '<input type="' . esc_attr($field_type) . '" name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '" value="' . esc_attr(is_array($value) ? implode(', ', $value) : $value) . '" class="widefat"' . $placeholder . '>';
                         break;
                 }
                 ?>
@@ -1301,10 +1387,12 @@ class MultiSecureDynamicCPT {
                 } else {
                     $meta_data[$field_name] = sanitize_text_field(wp_unslash($_POST[$field_name]));
                 }
+                update_post_meta($post_id, $field_name, $meta_data[$field_name]);
             } else {
                 // Handle unchecked checkboxes
                 if (($field_config['type'] ?? 'text') === 'checkbox') {
                     $meta_data[$field_name] = [];
+                    update_post_meta($post_id, $field_name, []);
                 }
             }
         }
