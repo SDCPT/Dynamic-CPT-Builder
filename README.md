@@ -1,50 +1,66 @@
 # Secure & Dynamic CPT Builder
-##### Rebuild of my Plugin from 2022 for more security and now for free
 
-> [!IMPORTANT]  
-> stable core! Rebuild! New and better stuff! Works fine till yet! 😃
+### The ultimate solution for creating multiple Custom Post Types (CPTs) – simple, clean, and secure with maximum PHP power.
 
-> [!NOTE]
-> I use another way to create this slim dynamic CPT. While I don't have much time, I'm updating it as I need it myself. I don't want this slim plugin to die - if you want to contribute and have time, I would be glad if you help extend this plugin together. It will always stay free for all, but please no bloat!
+**Secure & Dynamic CPT Builder** is a WordPress plugin that allows developers and site administrators to **dynamically create and manage custom post types** from the admin panel, with a strong focus on **security, performance, and flexibility**.
 
-**Secure & Dynamic CPT Builder** is a WordPress plugin that allows developers and administrators to create custom post types dynamically from the admin panel, with a strong focus on security and data integrity.
-
-This plugin provides a robust and customizable framework for handling user-submitted data, ensuring it is sanitized, validated, and securely stored in a dedicated database table.
-
-## Features
-
-* **Dynamic CPT Creation:** Create and manage new custom post types directly from a user-friendly admin page without writing a single line of code.
-* **Custom Form Fields:** Define form fields for each CPT using a flexible JSON structure, supporting various input types like `text`, `textarea`, `email`, and more.
-* **Secure Data Handling:** All form submissions are protected with nonce verification and stored in a custom database table using PDO prepared statements to prevent SQL injection.
-* **Dedicated Entry Management:** A new admin section provides a central hub to manage all form submissions. Admins can review, approve, and convert entries to a published WordPress post with a single click.
-* **Smart Metabox Integration:** An intelligent backend metabox automatically links existing WordPress posts to the custom database, ensuring data consistency and allowing you to save additional fields for any post, even those created manually.
-* **Robust Deletion:** The CPT deletion process now safely removes the custom post type and all associated entries and WordPress posts, preventing data orphans.
+Unlike traditional CPT plugins, this solution prioritizes **data integrity**, **clean architecture**, and **security-first principles**, ensuring that all user-submitted content is validated and securely stored.
 
 ---
 
-## Why this plugin is different
+## ✅ Key Features
 
-While many CPT plugins offer flexibility, they often fall short on security. **Secure & Dynamic CPT Builder** is built on the principle of "security by default." It separates submitted data from the main WordPress post table and uses strict validation, making it an ideal choice for projects where **data integrity and user security are critical**.
+* **Dynamic CPT Creation**
+  Create and manage custom post types directly from the WordPress admin panel without writing code.
+
+* **Custom Form Fields with JSON**
+  Define fields for each CPT using a JSON-based structure. Supports various input types: `text`, `textarea`, `email`, `tel`, and more.
+
+* **Secure Data Handling**
+  All submissions are protected with **nonce verification** and stored using **PDO prepared statements** to prevent SQL injection.
+
+* **Dedicated Entry Management**
+  Manage all form submissions in a central admin dashboard. Approve, edit, or convert entries into published posts with a single click.
+
+* **Smart Metabox Integration**
+  Automatically links additional fields to existing WordPress posts. Works even for posts created manually.
+
+* **Clean & Slim Architecture**
+  Minimal code footprint for **high performance** and **maximum compatibility** with WordPress core.
+
+* **Safe Deletion**
+  When you delete a CPT, all associated data (custom entries, linked posts) is removed properly, preventing orphaned records.
 
 ---
 
-## Installation
+## 🔍 Why This Plugin?
 
-1.  Upload the plugin folder to your `wp-content/plugins/` directory.
-2.  Activate the plugin through the **Plugins → Installed Plugins** menu in WordPress.
-3.  A new admin menu item named **"Secure CPTs"** will appear.
+Most CPT plugins are flexible but **lack security** or **bloat your site**. This plugin is built with:
+
+* **Security by default**
+* **Data stored in a separate table** for better structure and validation
+* **Slim and optimized code**, no unnecessary overhead
+* **Ideal for projects where security and performance matter**
 
 ---
 
-## Usage
+## 📦 Installation
 
-### Create a CPT
+1. Upload the plugin folder to your `wp-content/plugins/` directory.
+2. Activate it via **Plugins → Installed Plugins** in WordPress.
+3. A new menu item **Secure CPTs** will appear in the admin panel.
 
-* Go to the **"Secure CPTs"** admin page.
-* Enter a **CPT Key**, **Name**, and **URL Slug**.
-* Define your form fields in the **Fields JSON** editor.
+---
 
-Here is a basic JSON example for your fields:
+## 🚀 Usage
+
+### 1. Create a Custom Post Type
+
+* Go to **Secure CPTs** in the admin panel.
+* Enter a **CPT Key**, **Name**, and **Slug**.
+* Define fields in JSON format.
+
+Example:
 
 ```json
 {
@@ -71,11 +87,12 @@ Here is a basic JSON example for your fields:
         "required": false
     }
 }
-````
+```
 
-note: variable  "content" is for cpt post content. you can use other text areas but they will be shown only in block/wigets/archives or single view
+**Note:**
 
-if you want only as cpt for posts its enought to use below by generating an CPT
+* `"content"` maps to the WordPress post content.
+* If you only need basic posts, use:
 
 ```json
 {
@@ -92,37 +109,51 @@ if you want only as cpt for posts its enought to use below by generating an CPT
         "is_content": true
     }
 }
-````
+```
 
+---
 
+### 2. Display the Form on the Frontend
 
+Use the shortcode:
 
+```
+[secure_cpt_form cpt="your_cpt_key"]
+```
 
-### Display a Form on the Frontend
+---
 
-Place the following shortcode on any page or post:
+### 3. Display a List of Entries
 
-`[secure_cpt_form cpt="your_cpt_key"]`
+Use the shortcode:
 
-### Display a List of Entries
+```
+[secure_cpt_list cpt="your_cpt_key"]
+```
 
-Place the following shortcode on any page or post:
+**Tip:** CPT archives and single pages are automatically handled by WordPress templates. Shortcodes are for custom page layouts.
 
-`[secure_cpt_list cpt="your_cpt_key"]`
+---
 
-**Note:** All registered CPTs are also automatically displayed on their standard WordPress archive pages (e.g., `/your_cpt_slug/`) and single post templates. This shortcode is a bonus feature for custom use cases where you need to display a list on a specific page. For modern themes like Twenty-Twenty, the standard archive page often offers better styling control.
+## 🛠 Roadmap
 
------
+* [ ] Import/Export CPT configurations
+* [ ] Full REST API support
+* [ ] Enable/disable front-end form per CPT
+* [ ] Enable/disable entry listing per CPT
+* [ ] CSS simplification (reduce custom UI, inherit theme styles)
+* [ ] Separate CSS files for `admin.css` and `public.css`
+* [ ] Default template parts for single and archive views
+* [ ] Fix post publish from Manage Entries (draft/trash works fine)
 
-## Roadmap
+**Done so far:**
+✔ More field types
+✔ Validation & sanitization improvements
+✔ Secure content flag
+✔ Core cleanup for better performance
 
-  * Import/Export CPT configurations.
-  * Enhanced REST API support.
-### added
-  * More field types 
+---
 
------
+## 📄 License
 
-## License
-
-Apache 2 + notes section 4
+Licensed under **Apache 2.0** (see `LICENSE` file for details).
