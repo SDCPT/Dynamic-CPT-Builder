@@ -1,0 +1,67 @@
+{
+    "title": {
+        "label": "Shop Name",
+        "type": "text",
+        "required": true,
+        "is_title": true
+    },
+    "content": {
+        "label": "Description",
+        "type": "textarea",
+        "required": false,
+        "is_content": true
+    },
+    "phone": {
+        "label": "Phone Number",
+        "type": "tel",
+        "required": true
+    },
+    "email": {
+        "label": "Contact Email",
+        "type": "email",
+        "required": false
+    },
+    "website": {
+        "label": "Website",
+        "type": "url",
+        "required": false
+    },
+    "location": {
+        "label": "Shop Location",
+        "type": "text",
+        "required": true,
+        "placeholder": "e.g., Berlin, Germany"
+    },
+    "delivery_available": {
+        "label": "Delivery Available?",
+        "type": "radio",
+        "required": true,
+        "options": [
+            { "value": "yes", "label": "Yes" },
+            { "value": "no", "label": "No" }
+        ]
+    },
+    "flower_types": {
+        "label": "Flower Types",
+        "type": "select",
+        "multiple": true,
+        "required": false,
+        "options": [
+            { "value": "roses", "label": "Roses" },
+            { "value": "tulips", "label": "Tulips" },
+            { "value": "orchids", "label": "Orchids" },
+            { "value": "mixed", "label": "Mixed Bouquets" }
+        ]
+    },
+    "payment_methods": {
+        "label": "Payment Methods",
+        "type": "select",
+        "multiple": true,
+        "required": false,
+        "options": [
+            { "value": "cash", "label": "Cash" },
+            { "value": "card", "label": "Credit/Debit Card" },
+            { "value": "paypal", "label": "PayPal" }
+        ]
+    }
+}

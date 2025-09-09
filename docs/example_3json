@@ -1,0 +1,235 @@
+{
+    "title": {
+        "label": "Title",
+        "type": "text",
+        "required": true,
+        "is_title": true
+    },
+    "content": {
+        "label": "Content",
+        "type": "textarea",
+        "required": false,
+        "is_content": true
+    },
+    "email": {
+        "label": "Contact Email",
+        "type": "email",
+        "required": true
+    },
+    "phone": {
+        "label": "Phone Number",
+        "type": "tel",
+        "required": false
+    },
+    "website": {
+        "label": "Portfolio URL",
+        "type": "url",
+        "required": false
+    },
+    "location": {
+        "label": "Location",
+        "type": "text",
+        "required": false,
+        "placeholder": "e.g., Berlin, Germany"
+    },
+    "experience_level": {
+        "label": "Experience Level",
+        "type": "select",
+        "required": true,
+        "options": [
+            {
+                "value": "junior",
+                "label": "Junior Developer"
+            },
+            {
+                "value": "mid",
+                "label": "Mid-Level Developer"
+            },
+            {
+                "value": "senior",
+                "label": "Senior Developer"
+            },
+            {
+                "value": "lead",
+                "label": "Tech Lead"
+            },
+            {
+                "value": "architect",
+                "label": "Architect"
+            }
+        ]
+    },
+    "programming_languages": {
+        "label": "Programming Languages",
+        "type": "select",
+        "multiple": true,
+        "required": true,
+        "options": [
+            {
+                "value": "php",
+                "label": "PHP"
+            },
+            {
+                "value": "javascript",
+                "label": "JavaScript"
+            },
+            {
+                "value": "python",
+                "label": "Python"
+            },
+            {
+                "value": "java",
+                "label": "Java"
+            },
+            {
+                "value": "cpp",
+                "label": "C++"
+            },
+            {
+                "value": "csharp",
+                "label": "C#"
+            },
+            {
+                "value": "ruby",
+                "label": "Ruby"
+            },
+            {
+                "value": "go",
+                "label": "Go"
+            },
+            {
+                "value": "rust",
+                "label": "Rust"
+            },
+            {
+                "value": "typescript",
+                "label": "TypeScript"
+            },
+            {
+                "value": "swift",
+                "label": "Swift"
+            },
+            {
+                "value": "kotlin",
+                "label": "Kotlin"
+            }
+        ]
+    },
+    "frameworks_and_tools": {
+        "label": "Frameworks & Tools",
+        "type": "select",
+        "multiple": true,
+        "required": false,
+        "options": [
+            {
+                "value": "laravel",
+                "label": "Laravel"
+            },
+            {
+                "value": "symfony",
+                "label": "Symfony"
+            },
+            {
+                "value": "react",
+                "label": "React.js"
+            },
+            {
+                "value": "angular",
+                "label": "Angular"
+            },
+            {
+                "value": "vue",
+                "label": "Vue.js"
+            },
+            {
+                "value": "django",
+                "label": "Django"
+            },
+            {
+                "value": "flask",
+                "label": "Flask"
+            },
+            {
+                "value": "spring",
+                "label": "Spring"
+            },
+            {
+                "value": "net",
+                "label": ".NET"
+            },
+            {
+                "value": "docker",
+                "label": "Docker"
+            },
+            {
+                "value": "kubernetes",
+                "label": "Kubernetes"
+            },
+            {
+                "value": "aws",
+                "label": "AWS"
+            },
+            {
+                "value": "gcp",
+                "label": "Google Cloud Platform"
+            }
+        ]
+    },
+    "spoken_languages": {
+        "label": "Spoken Languages",
+        "type": "select",
+        "multiple": true,
+        "required": false,
+        "options": [
+            {
+                "value": "en",
+                "label": "English"
+            },
+            {
+                "value": "de",
+                "label": "German"
+            },
+            {
+                "value": "es",
+                "label": "Spanish"
+            },
+            {
+                "value": "fr",
+                "label": "French"
+            },
+            {
+                "value": "it",
+                "label": "Italian"
+            },
+            {
+                "value": "ru",
+                "label": "Russian"
+            },
+            {
+                "value": "zh",
+                "label": "Mandarin Chinese"
+            }
+        ]
+    },
+    "soft_skills": {
+        "label": "Soft Skills",
+        "type": "textarea",
+        "required": false,
+        "placeholder": "e.g., Problem-solving, Communication, Teamwork"
+    },
+    "availability": {
+        "label": "Currently available for new projects?",
+        "type": "radio",
+        "required": true,
+        "options": [
+            {
+                "value": "yes",
+                "label": "Yes"
+            },
+            {
+                "value": "no",
+                "label": "No"
+            }
+        ]
+    }
+}
