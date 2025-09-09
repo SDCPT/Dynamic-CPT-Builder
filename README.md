@@ -1,6 +1,6 @@
 # Secure & Dynamic CPT Builder
 
-### The ultimate solution for creating multiple Custom Post Types (CPTs) – simple, clean, and secure with maximum PHP power.
+#### The ultimate solution for creating multiple Custom Post Types (CPTs) – simple, clean, and secure with maximum PHP power.
 
 **Secure & Dynamic CPT Builder** is a WordPress plugin that allows developers and site administrators to **dynamically create and manage custom post types** from the admin panel, with a strong focus on **security, performance, and flexibility**.
 
