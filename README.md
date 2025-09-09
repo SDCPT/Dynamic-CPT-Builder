@@ -8,7 +8,7 @@ Unlike traditional CPT plugins, this solution prioritizes **data integrity**, **
 
 ---
 
-## ✅ Key Features
+## Key Features
 
 * **Dynamic CPT Creation**
   Create and manage custom post types directly from the WordPress admin panel without writing code.
@@ -33,7 +33,7 @@ Unlike traditional CPT plugins, this solution prioritizes **data integrity**, **
 
 ---
 
-## 🔍 Why This Plugin?
+### Why This Plugin?
 
 Most CPT plugins are flexible but **lack security** or **bloat your site**. This plugin is built with:
 
@@ -44,7 +44,7 @@ Most CPT plugins are flexible but **lack security** or **bloat your site**. This
 
 ---
 
-## 📦 Installation
+### Installation
 
 1. Upload the plugin folder to your `wp-content/plugins/` directory.
 2. Activate it via **Plugins → Installed Plugins** in WordPress.
@@ -52,7 +52,7 @@ Most CPT plugins are flexible but **lack security** or **bloat your site**. This
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### 1. Create a Custom Post Type
 
