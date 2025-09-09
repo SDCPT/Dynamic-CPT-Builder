@@ -69,6 +69,8 @@ Here is a basic JSON example for your fields:
 }
 ````
 
+note: variable  "content" is for cpt post content. you can use other text areas but they will be shown only in block/wigets.
+
 ### Display a Form on the Frontend
 
 Place the following shortcode on any page or post:
