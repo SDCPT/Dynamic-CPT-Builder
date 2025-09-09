@@ -38,10 +38,10 @@ Unlike traditional CPT plugins or Business Directories , this solution prioritiz
 
 Most CPT plugins are flexible but **lack security** or **bloat your site**. This plugin is built with:
 * **With ❤️‍🔥 and 🧠**
-*  **Security by default**
+*  **Security and clen code by default**
 * **Data stored in a separate table** for better structure and validation
 * **Slim and optimized code**, no unnecessary overhead
-* **Ideal for projects where security and performance matter**
+* **Ideal for projects where security and performance matters**
 
 ---
 
