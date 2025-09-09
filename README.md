@@ -2,7 +2,7 @@
 
 ![SDCPT](screenshot.jpg)
 
-> My solution for creating multiple Custom Post Types (CPTs) – slim, simple, clean, and secure with maximum PHP power.
+> Slim & powerfull solution for creating multiple Custom Post Types (CPTs) –  simple, clean, and secure with real PHP power.
 
 ## About
 
