@@ -1,4 +1,5 @@
 # Secure & Dynamic CPT Builder
+##### Version: 2.3.0
 
 #### The ultimate solution for creating multiple Custom Post Types (CPTs) – simple, clean, and secure with maximum PHP power.
 
