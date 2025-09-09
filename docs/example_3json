@@ -1,14 +1,15 @@
 {
     "title": {
-        "label": "Full Name",
+        "label": "Title",
         "type": "text",
-        "required": true
+        "required": true,
+        "is_title": true
     },
     "content": {
         "label": "Content",
         "type": "textarea",
         "required": false,
-        "placeholder": "A brief summary of your professional experience and interests. Will be shown as post content"
+        "is_content": true
     },
     "email": {
         "label": "Contact Email",
