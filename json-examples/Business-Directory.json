@@ -1,0 +1,61 @@
+{
+    "title": {
+        "label": "Company Name",
+        "type": "text",
+        "required": true,
+        "is_title": true
+    },
+    "content": {
+        "label": "Description",
+        "type": "textarea",
+        "required": false,
+        "is_content": true
+    },
+    "email": {
+        "label": "Email",
+        "type": "email",
+        "required": true
+    },
+    "phone": {
+        "label": "Phone Number",
+        "type": "tel",
+        "required": true
+    },
+    "website": {
+        "label": "Website",
+        "type": "url",
+        "required": false
+    },
+    "location": {
+        "label": "Location",
+        "type": "text",
+        "required": true,
+        "placeholder": "e.g., Berlin, Germany"
+    },
+    "branch": {
+        "label": "Industry",
+        "type": "select",
+        "required": true,
+        "options": [
+            { "value": "it", "label": "IT & Software" },
+            { "value": "construction", "label": "Construction" },
+            { "value": "health", "label": "Health & Medical" },
+            { "value": "finance", "label": "Finance" },
+            { "value": "education", "label": "Education" },
+            { "value": "hospitality", "label": "Hospitality & Tourism" },
+            { "value": "retail", "label": "Retail & E-Commerce" },
+            { "value": "transport", "label": "Transport & Logistics" },
+            { "value": "other", "label": "Other" }
+        ]
+    },
+    "employees": {
+        "label": "Number of Employees",
+        "type": "number",
+        "required": false
+    },
+    "founded": {
+        "label": "Year Founded",
+        "type": "number",
+        "required": false
+    }
+}
