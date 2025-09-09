@@ -4,8 +4,8 @@
         "type": "text",
         "required": true
     },
-    "profile_summary": {
-        "label": "Profile Summary",
+    "content": {
+        "label": "Content",
         "type": "textarea",
         "required": false,
         "placeholder": "A brief summary of your professional experience and interests."
