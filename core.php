@@ -2,37 +2,13 @@
 /**
  * Plugin Name: Multi Secure Dynamic CPTs
  * Description: A plugin to create dynamic CPTs with secure form submission to a custom database table.
- * Version: 1.0.4
+ * Version: 1.0.7
  * Author: Volkan Kücükbudak
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
-
-// HOW TO USE THE NEW TEMPLATING FUNCTION:
-// To display the custom fields on a single post page,
-// place the following code in your theme's single-{cpt-key}.php file
-// or hook it into 'the_content' filter:
-//
-// add_filter('the_content', function($content) {
-//     $plugin = new MultiSecureDynamicCPT();
-//     return $content . $plugin->display_entry_meta_on_frontend($content);
-// });
-
-// soon
-// Define plugin constants
-//define('SDCPT_PATH', plugin_dir_path(__FILE__));
-//define('SDCPT_URL', plugin_dir_url(__FILE__));
-
-// Load modules
-//require_once SDCPT_PATH . 'modules/export.php';
-//require_once SDCPT_PATH . 'modules/import.php';
-//require_once SDCPT_PATH . 'modules/advanced-fields.php';
-
-
-
-// soon end
 
 class MultiSecureDynamicCPT {
 
@@ -70,6 +46,7 @@ class MultiSecureDynamicCPT {
         $this->cpt_table = $wpdb->prefix . 'dynamic_cpts';
 
         register_activation_hook(__FILE__, [$this, 'create_tables']);
+        register_deactivation_hook(__FILE__, [$this, 'deactivate_plugin']);
 
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('init', [$this, 'register_cpts']);
@@ -122,6 +99,8 @@ class MultiSecureDynamicCPT {
             UNIQUE KEY uk_cpt_key (cpt_key)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
         dbDelta($sql_cpt);
+
+        update_option('multi_secure_cpt_db_version', $this->db_version);
     }
     
     private function get_pdo_connection() {
@@ -173,32 +152,101 @@ class MultiSecureDynamicCPT {
             return [];
         }
     }
-
+    
     public function register_cpts() {
         $cpts = $this->get_all_cpts();
         foreach ($cpts as $cpt) {
             $labels = [
                 'name' => _x($cpt['cpt_name'], 'Post Type General Name', 'multi-secure-cpt'),
                 'singular_name' => _x($cpt['cpt_singular'], 'Post Type Singular Name', 'multi-secure-cpt'),
+                'menu_name' => $cpt['cpt_name'],
+                'name_admin_bar' => $cpt['cpt_singular'],
+                'archives' => $cpt['cpt_singular'] . ' Archives',
+                'attributes' => $cpt['cpt_singular'] . ' Attributes',
+                'parent_item_colon' => 'Parent ' . $cpt['cpt_singular'] . ':',
+                'all_items' => 'All ' . $cpt['cpt_name'],
+                'add_new_item' => 'Add New ' . $cpt['cpt_singular'],
+                'add_new' => 'Add New',
+                'new_item' => 'New ' . $cpt['cpt_singular'],
+                'edit_item' => 'Edit ' . $cpt['cpt_singular'],
+                'update_item' => 'Update ' . $cpt['cpt_singular'],
+                'view_item' => 'View ' . $cpt['cpt_singular'],
+                'view_items' => 'View ' . $cpt['cpt_name'],
+                'search_items' => 'Search ' . $cpt['cpt_name'],
+                'not_found' => 'Not found',
+                'not_found_in_trash' => 'Not found in Trash',
+                'featured_image' => 'Featured Image',
+                'set_featured_image' => 'Set featured image',
+                'remove_featured_image' => 'Remove featured image',
+                'use_featured_image' => 'Use as featured image',
+                'insert_into_item' => 'Insert into ' . strtolower($cpt['cpt_singular']),
+                'uploaded_to_this_item' => 'Uploaded to this ' . strtolower($cpt['cpt_singular']),
+                'items_list' => $cpt['cpt_name'] . ' list',
+                'items_list_navigation' => $cpt['cpt_name'] . ' list navigation',
+                'filter_items_list' => 'Filter ' . strtolower($cpt['cpt_name']) . ' list',
             ];
+
             $args = [
                 'labels' => $labels,
+                'description' => 'Custom post type: ' . $cpt['cpt_name'],
                 'public' => true,
                 'publicly_queryable' => true,
                 'show_ui' => true,
                 'show_in_menu' => true,
                 'query_var' => true,
-                'rewrite' => ['slug' => $cpt['cpt_slug']],
+                'rewrite' => [
+                    'slug' => $cpt['cpt_slug'],
+                    'with_front' => false,
+                    'pages' => true,
+                    'feeds' => true,
+                ],
                 'capability_type' => 'post',
                 'has_archive' => true,
                 'hierarchical' => false,
                 'menu_position' => null,
-                'supports' => ['title', 'editor', 'author', 'thumbnail', 'excerpt'],
-                'show_in_rest' => true
+                'menu_icon' => 'dashicons-admin-post',
+                
+                'supports' => [
+                    'title',
+                    'editor',
+                    'author', 
+                    'thumbnail',
+                    'excerpt',
+                    'trackbacks',
+                    'custom-fields',
+                    'comments',
+                    'revisions',
+                    'page-attributes',
+                    'post-formats'
+                ],
+                
+                'show_in_rest' => true,
+                'rest_base' => $cpt['cpt_slug'],
+                'rest_controller_class' => 'WP_REST_Posts_Controller',
+                
+                'show_in_admin_bar' => true,
+                'show_in_nav_menus' => true,
+                'can_export' => true,
+                'exclude_from_search' => false,
+                
+                'has_archive' => $cpt['cpt_slug'],
+                'delete_with_user' => false,
+                
+                'taxonomies' => ['category', 'post_tag'],
+                
+                'template' => [],
             ];
+            
+            $args = apply_filters('multi_secure_cpt_args', $args, $cpt);
             register_post_type($cpt['cpt_key'], $args);
         }
+        
+        if (get_option('multi_secure_cpt_flush_rewrite_rules', false)) {
+            flush_rewrite_rules();
+            delete_option('multi_secure_cpt_flush_rewrite_rules');
+        }
     }
+
 
     /**
      * Main admin page
@@ -291,8 +339,7 @@ class MultiSecureDynamicCPT {
                                         <?php _e('Show Shortcode', 'multi-secure-cpt'); ?>
                                     </button>
                                     <button class="button button-link-delete delete-cpt-btn" data-cpt="<?php echo esc_attr($cpt['cpt_key']); ?>">
-                                        <?php _e('Delete', 'multi-secure-cpt'); ?>
-                                    </button>
+                                        <?php _e('Delete', 'multi-secure-cpt'); ?></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -518,7 +565,7 @@ class MultiSecureDynamicCPT {
                     wp_send_json_error('Failed to update CPT.');
                 }
                 $pdo->commit();
-                flush_rewrite_rules();
+                update_option('multi_secure_cpt_flush_rewrite_rules', true);
                 wp_send_json_success('CPT updated successfully');
             } else {
                 // Create new CPT
@@ -527,7 +574,7 @@ class MultiSecureDynamicCPT {
 
                 if ($result) {
                     $pdo->commit();
-                    flush_rewrite_rules();
+                    update_option('multi_secure_cpt_flush_rewrite_rules', true);
                     wp_send_json_success('CPT created successfully');
                 } else {
                     $pdo->rollBack();
@@ -608,7 +655,7 @@ class MultiSecureDynamicCPT {
 
             if ($result) {
                 $pdo->commit();
-                flush_rewrite_rules();
+                update_option('multi_secure_cpt_flush_rewrite_rules', true);
                 wp_send_json_success('CPT and all associated data deleted successfully');
             } else {
                 $pdo->rollBack();
@@ -620,6 +667,12 @@ class MultiSecureDynamicCPT {
             wp_send_json_error('Database error: ' . $e->getMessage());
         }
     }
+    
+    private function deactivate_plugin() {
+        // Option to flush rewrite rules on deactivation if necessary
+        update_option('multi_secure_cpt_flush_rewrite_rules', true);
+    }
+
 
     public function manage_entries_page() {
         $pdo = $this->get_pdo_connection();
@@ -629,6 +682,7 @@ class MultiSecureDynamicCPT {
         }
 
         $current_cpt = isset($_GET['cpt']) ? sanitize_key($_GET['cpt']) : '';
+        $current_status = 'pending';
         $cpts = $this->get_all_cpts();
 
         if (isset($_POST['action']) && $_POST['action'] === 'update_status' && isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'update_entry_status')) {
@@ -638,6 +692,7 @@ class MultiSecureDynamicCPT {
         ?>
         <div class="wrap">
             <h1><?php _e('Manage All Entries', 'multi-secure-cpt'); ?></h1>
+            <p><?php _e('All entries pending review from the frontend form submissions.', 'multi-secure-cpt'); ?></p>
 
             <div class="cpt-filter">
                 <form method="get">
@@ -655,10 +710,17 @@ class MultiSecureDynamicCPT {
 
             <?php
             try {
-                $where_clause = $current_cpt ? "WHERE cpt_key = ?" : "";
-                $params = $current_cpt ? [$current_cpt] : [];
+                $where_clauses = ["status = 'pending'"];
+                $params = [];
 
-                $stmt = $pdo->prepare("SELECT * FROM {$this->table_name} {$where_clause} ORDER BY created_at DESC LIMIT 100");
+                if ($current_cpt) {
+                    $where_clauses[] = "cpt_key = ?";
+                    $params[] = $current_cpt;
+                }
+                
+                $where_clause_sql = count($where_clauses) > 0 ? "WHERE " . implode(' AND ', $where_clauses) : "";
+
+                $stmt = $pdo->prepare("SELECT * FROM {$this->table_name} {$where_clause_sql} ORDER BY created_at DESC LIMIT 100");
                 $stmt->execute($params);
                 $entries = $stmt->fetchAll();
                 ?>
@@ -670,14 +732,13 @@ class MultiSecureDynamicCPT {
                             <th><?php _e('CPT', 'multi-secure-cpt'); ?></th>
                             <th><?php _e('Title', 'multi-secure-cpt'); ?></th>
                             <th><?php _e('Status', 'multi-secure-cpt'); ?></th>
-                            <th><?php _e('WP Post ID', 'multi-secure-cpt'); ?></th>
                             <th><?php _e('Created', 'multi-secure-cpt'); ?></th>
                             <th><?php _e('Actions', 'multi-secure-cpt'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($entries)): ?>
-                            <tr><td colspan="7"><?php _e('No entries found.', 'multi-secure-cpt'); ?></td></tr>
+                            <tr><td colspan="6"><?php _e('No pending entries found.', 'multi-secure-cpt'); ?></td></tr>
                         <?php else: ?>
                             <?php foreach ($entries as $entry): ?>
                                 <tr>
@@ -685,13 +746,6 @@ class MultiSecureDynamicCPT {
                                     <td><code><?php echo esc_html($entry['cpt_key']); ?></code></td>
                                     <td><?php echo esc_html($entry['title']); ?></td>
                                     <td><?php echo esc_html(ucfirst($entry['status'])); ?></td>
-                                    <td>
-                                        <?php if (!empty($entry['wp_post_id']) && get_post($entry['wp_post_id'])): ?>
-                                            <a href="<?php echo get_edit_post_link($entry['wp_post_id']); ?>"><?php echo esc_html($entry['wp_post_id']); ?></a>
-                                        <?php else: ?>
-                                            -
-                                        <?php endif; ?>
-                                    </td>
                                     <td><?php echo esc_html($entry['created_at']); ?></td>
                                     <td>
                                         <form method="post" style="display: inline;">
@@ -700,9 +754,9 @@ class MultiSecureDynamicCPT {
                                             <input type="hidden" name="entry_id" value="<?php echo esc_attr($entry['id']); ?>">
                                             <select name="status" onchange="this.form.submit()">
                                                 <option value="pending" <?php selected($entry['status'], 'pending'); ?>><?php _e('Pending', 'multi-secure-cpt'); ?></option>
-                                                <option value="published" <?php selected($entry['status'], 'published'); ?>><?php _e('Published', 'multi-secure-cpt'); ?></option>
-                                                <option value="draft" <?php selected($entry['status'], 'draft'); ?>><?php _e('Draft', 'multi-secure-cpt'); ?></option>
-                                                <option value="trash" <?php selected($entry['status'], 'trash'); ?>><?php _e('Trash', 'multi-secure-cpt'); ?></option>
+                                                <option value="published"><?php _e('Publish', 'multi-secure-cpt'); ?></option>
+                                                <option value="draft"><?php _e('Draft', 'multi-secure-cpt'); ?></option>
+                                                <option value="trash"><?php _e('Trash', 'multi-secure-cpt'); ?></option>
                                             </select>
                                         </form>
                                     </td>
@@ -729,11 +783,21 @@ class MultiSecureDynamicCPT {
         if (!in_array($status, $allowed_statuses)) return false;
 
         try {
-            $stmt = $pdo->prepare("UPDATE {$this->table_name} SET status = ?, updated_at = NOW() WHERE id = ?");
-            $result = $stmt->execute([$status, $entry_id]);
-
-            if ($result && $status === 'published') {
-                $this->create_wp_post_from_entry($entry_id);
+            $stmt = $pdo->prepare("SELECT * FROM {$this->table_name} WHERE id = ?");
+            $stmt->execute([(int)$entry_id]);
+            $entry = $stmt->fetch();
+            
+            if (!$entry) return false;
+            
+            if ($status === 'pending') {
+                // No action needed for pending status
+            } else if ($status === 'draft' || $status === 'published') {
+                $post_id = $this->create_or_update_wp_post($entry, $status);
+                if ($post_id) {
+                    $this->delete_secure_entry($entry_id);
+                }
+            } else if ($status === 'trash') {
+                $this->delete_secure_entry($entry_id);
             }
 
             return true;
@@ -743,46 +807,55 @@ class MultiSecureDynamicCPT {
         }
     }
 
-    private function create_wp_post_from_entry($entry_id) {
-        $pdo = $this->get_pdo_connection();
-        if (!$pdo) return false;
+    private function create_or_update_wp_post($entry, $post_status) {
+        $meta_data = json_decode($entry['meta_data'], true);
+        
+        $post_data = [
+            'post_title'    => sanitize_text_field($entry['title']),
+            'post_content'  => wp_kses_post($entry['content']),
+            'post_status'   => $post_status,
+            'post_type'     => $entry['cpt_key'],
+        ];
 
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM {$this->table_name} WHERE id = ?");
-            $stmt->execute([(int)$entry_id]);
-            $entry = $stmt->fetch();
+        $post_id = wp_insert_post($post_data, true);
 
-            if (!$entry) return false;
+        if (is_wp_error($post_id)) {
+            error_log('Error creating/updating WP post: ' . $post_id->get_error_message());
+            return false;
+        }
 
-            $post_id = $entry['wp_post_id'];
-            $meta_data = json_decode($entry['meta_data'], true);
-
-            $post_data = [
-                'post_title'    => sanitize_text_field($entry['title']),
-                'post_content'  => wp_kses_post($entry['content']),
-                'post_status'   => 'publish',
-                'post_type'     => $entry['cpt_key'],
-            ];
-
-            if ($post_id && get_post($post_id)) {
-                $post_data['ID'] = $post_id;
-                wp_update_post($post_data);
-            } else {
-                $post_id = wp_insert_post($post_data);
-                if ($post_id && !is_wp_error($post_id)) {
-                    $update_stmt = $pdo->prepare("UPDATE {$this->table_name} SET wp_post_id = ? WHERE id = ?");
-                    $update_stmt->execute([$post_id, $entry_id]);
+        if ($post_id && is_array($meta_data)) {
+            foreach ($meta_data as $key => $value) {
+                // Exclude title and content from being saved as post meta
+                if ($key === 'title' || $key === 'content') {
+                    continue;
                 }
-            }
 
-            if ($post_id && !is_wp_error($post_id) && is_array($meta_data)) {
-                foreach ($meta_data as $key => $value) {
+                // Check if the value is a JSON string before attempting to decode
+                $decoded_value = json_decode($value, true);
+
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded_value)) {
+                    // It's a valid JSON array, so update_post_meta with the array directly
+                    update_post_meta($post_id, sanitize_key($key), $decoded_value);
+                } else {
+                    // It's a simple string, sanitize and save
                     update_post_meta($post_id, sanitize_key($key), sanitize_text_field($value));
                 }
             }
-            return $post_id;
+        }
+        return $post_id;
+    }
+    
+    private function delete_secure_entry($entry_id) {
+        $pdo = $this->get_pdo_connection();
+        if (!$pdo) return false;
+        
+        try {
+            $stmt = $pdo->prepare("DELETE FROM {$this->table_name} WHERE id = ?");
+            $stmt->execute([$entry_id]);
+            return true;
         } catch (PDOException $e) {
-            error_log('Error creating WP post from entry: ' . $e->getMessage());
+            error_log('Error deleting secure entry: ' . $e->getMessage());
             return false;
         }
     }
@@ -821,7 +894,6 @@ class MultiSecureDynamicCPT {
         echo '<select ' . $attributes;
         if (!empty($field_config['multiple'])) {
             echo ' multiple';
-            $attributes .= '[]'; // Add array notation for multiple select
         }
         echo '>';
         if (!empty($field_config['options'])) {
@@ -837,7 +909,7 @@ class MultiSecureDynamicCPT {
             foreach ($field_config['options'] as $option) {
                 echo '<label class="checkbox-label">';
                 echo '<input type="checkbox" name="' . esc_attr($field_name) . 
-                     '" value="' . esc_attr($option['value']) . '"' . 
+                     '[]" value="' . esc_attr($option['value']) . '"' . 
                      $required . '> ';
                 echo esc_html($option['label']);
                 echo '</label>';
@@ -939,26 +1011,26 @@ class MultiSecureDynamicCPT {
             }
 
             .secure-cpt-form select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
 
-.secure-cpt-form select[multiple] {
-    height: auto;
-    min-height: 120px;
-}
+            .secure-cpt-form select[multiple] {
+                height: auto;
+                min-height: 120px;
+            }
 
-.secure-cpt-form .checkbox-label {
-    display: block;
-    margin-bottom: 5px;
-}
+            .secure-cpt-form .checkbox-label {
+                display: block;
+                margin-bottom: 5px;
+            }
 
-.secure-cpt-form input[type="checkbox"] {
-    margin-right: 5px;
-}
+            .secure-cpt-form input[type="checkbox"] {
+                margin-right: 5px;
+            }
         </style>
         <?php
         return ob_get_clean();
@@ -993,18 +1065,14 @@ class MultiSecureDynamicCPT {
         $meta_data = [];
 
         foreach ($form_fields as $key => $config) {
-
+            $value = '';
             if (isset($_POST[$key])) {
-    if (is_array($_POST[$key])) {
-        // Handle multiple values (e.g., multiple select)
-        $value = array_map('sanitize_text_field', wp_unslash($_POST[$key]));
-        $value = json_encode($value); // Store multiple values as JSON
-    } else {
-        $value = sanitize_text_field(wp_unslash($_POST[$key]));
-    }
-} else {
-    $value = '';
-}
+                if (is_array($_POST[$key])) {
+                    $value = array_map('sanitize_text_field', wp_unslash($_POST[$key]));
+                } else {
+                    $value = sanitize_text_field(wp_unslash($_POST[$key]));
+                }
+            }
             if (!empty($config['required']) && empty($value)) {
                 wp_send_json_error(['message' => ($config['label'] ?? $key) . ' is required.'], 400);
             }
@@ -1073,6 +1141,10 @@ class MultiSecureDynamicCPT {
             if (!empty($meta_data)) {
                 echo '<ul class="cpt-meta-list">';
                 foreach ($meta_data as $key => $value) {
+                    // Check if value is an array (from multiple select/checkboxes)
+                    if (is_array($value)) {
+                        $value = implode(', ', $value);
+                    }
                     echo '<li><strong>' . esc_html(ucfirst(str_replace('_', ' ', $key))) . ':</strong> ' . esc_html($value) . '</li>';
                 }
                 echo '</ul>';
@@ -1105,6 +1177,10 @@ class MultiSecureDynamicCPT {
         echo '<h2>' . __('Additional Information', 'multi-secure-cpt') . '</h2>';
         echo '<ul>';
         foreach ($meta_data as $key => $value) {
+            // Check if value is an array (from multiple select/checkboxes)
+            if (is_array($value)) {
+                $value = implode(', ', $value);
+            }
             echo '<li><strong>' . esc_html(ucfirst(str_replace('_', ' ', $key))) . ':</strong> ' . esc_html($value) . '</li>';
         }
         echo '</ul>';
@@ -1139,42 +1215,66 @@ class MultiSecureDynamicCPT {
         
         $meta_data = [];
 
-        // If no entry exists, create a new one to link it to the WP post
-        if (!$entry) {
-            $pdo = $this->get_pdo_connection();
-            if ($pdo) {
-                try {
-                    $stmt = $pdo->prepare("INSERT INTO {$this->table_name} (cpt_key, title, content, status, wp_post_id) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$cpt_key, $post->post_title, $post->post_content, 'published', $post->ID]);
-                    
-                    // Fetch the newly created entry
-                    $entry = $this->get_entry_by_post_id($post->ID);
-                } catch (PDOException $e) {
-                    error_log('Error creating entry for post: ' . $e->getMessage());
-                    echo '<p>' . __('Failed to create a database entry for this post. Please check the logs.', 'multi-secure-cpt') . '</p>';
-                }
-            }
-        }
-        
         if ($entry) {
             $meta_data = json_decode($entry['meta_data'], true);
+        } else {
+            // If no secure entry exists, load meta from post_meta table
+            $post_meta = get_post_meta($post->ID);
+            foreach ($form_fields as $field_name => $field_config) {
+                if ($field_name === 'title' || $field_name === 'content') continue;
+                if (isset($post_meta[$field_name])) {
+                    $meta_data[$field_name] = maybe_unserialize($post_meta[$field_name][0]);
+                }
+            }
         }
 
         wp_nonce_field('save_custom_meta', 'custom_meta_nonce');
         
         foreach ($form_fields as $field_name => $field_config) {
             if ($field_name === 'title' || $field_name === 'content') continue;
-            $value = $meta_data[$field_name] ?? '';
+            
+            $value = isset($meta_data[$field_name]) ? $meta_data[$field_name] : '';
+            $field_type = $field_config['type'] ?? 'text';
             ?>
             <div class="form-field" style="margin-bottom:10px;">
                 <label for="<?php echo esc_attr($field_name); ?>">
                     <strong><?php echo esc_html($field_config['label'] ?? $field_name); ?></strong>
                 </label>
-                <?php if (($field_config['type'] ?? 'text') === 'textarea'): ?>
-                    <textarea name="<?php echo esc_attr($field_name); ?>" id="<?php echo esc_attr($field_name); ?>" class="widefat" rows="4"><?php echo esc_textarea($value); ?></textarea>
-                <?php else: ?>
-                    <input type="text" name="<?php echo esc_attr($field_name); ?>" id="<?php echo esc_attr($field_name); ?>" value="<?php echo esc_attr($value); ?>" class="widefat">
-                <?php endif; ?>
+                <?php switch ($field_type) {
+                    case 'textarea':
+                        echo '<textarea name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '" class="widefat" rows="4">' . esc_textarea(is_array($value) ? implode(', ', $value) : $value) . '</textarea>';
+                        break;
+                    case 'select':
+                        $is_multiple = !empty($field_config['multiple']);
+                        $select_name = esc_attr($field_name) . ($is_multiple ? '[]' : '');
+                        $current_values = is_array($value) ? $value : [$value];
+
+                        echo '<select name="' . $select_name . '" id="' . esc_attr($field_name) . '" class="widefat"' . ($is_multiple ? ' multiple' : '') . '>';
+                        if (!empty($field_config['options'])) {
+                            foreach ($field_config['options'] as $option) {
+                                $selected = in_array($option['value'], $current_values) ? ' selected' : '';
+                                echo '<option value="' . esc_attr($option['value']) . '"' . $selected . '>' . esc_html($option['label']) . '</option>';
+                            }
+                        }
+                        echo '</select>';
+                        break;
+                    case 'checkbox':
+                        $current_values = is_array($value) ? $value : [$value];
+                        if (!empty($field_config['options'])) {
+                            foreach ($field_config['options'] as $option) {
+                                $checked = in_array($option['value'], $current_values) ? ' checked' : '';
+                                echo '<label class="checkbox-label">';
+                                echo '<input type="checkbox" name="' . esc_attr($field_name) . '[]" value="' . esc_attr($option['value']) . '"' . $checked . '> ';
+                                echo esc_html($option['label']);
+                                echo '</label>';
+                            }
+                        }
+                        break;
+                    default: // text, email, url, tel, number
+                        echo '<input type="' . esc_attr($field_type) . '" name="' . esc_attr($field_name) . '" id="' . esc_attr($field_name) . '" value="' . esc_attr(is_array($value) ? implode(', ', $value) : $value) . '" class="widefat">';
+                        break;
+                }
+                ?>
             </div>
             <?php
         }
@@ -1194,8 +1294,18 @@ class MultiSecureDynamicCPT {
 
         foreach ($form_fields as $field_name => $field_config) {
             if ($field_name === 'title' || $field_name === 'content') continue;
+            
             if (isset($_POST[$field_name])) {
-                $meta_data[$field_name] = sanitize_text_field(wp_unslash($_POST[$field_name]));
+                 if (is_array($_POST[$field_name])) {
+                    $meta_data[$field_name] = array_map('sanitize_text_field', wp_unslash($_POST[$field_name]));
+                } else {
+                    $meta_data[$field_name] = sanitize_text_field(wp_unslash($_POST[$field_name]));
+                }
+            } else {
+                // Handle unchecked checkboxes
+                if (($field_config['type'] ?? 'text') === 'checkbox') {
+                    $meta_data[$field_name] = [];
+                }
             }
         }
 
