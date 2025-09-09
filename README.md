@@ -49,13 +49,16 @@ Here is a basic JSON example for your fields:
 ```json
 {
     "title": {
-        "label": "Listing Title",
+        "label": "Title",
         "type": "text",
-        "required": true
+        "required": true,
+        "is_title": true
     },
     "content": {
-        "label": "Description",
-        "type": "textarea"
+        "label": "Content",
+        "type": "textarea",
+        "required": false,
+        "is_content": true
     },
     "email": {
         "label": "Contact Email",
@@ -64,7 +67,8 @@ Here is a basic JSON example for your fields:
     },
     "phone": {
         "label": "Phone Number",
-        "type": "tel"
+        "type": "tel",
+        "required": false
     }
 }
 ````
