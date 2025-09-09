@@ -147,10 +147,10 @@ Use the shortcode:
 * [ ] Fix post publish from Manage Entries (draft/trash works fine)
 
 **Done so far:**
-- ✔ More field types
-- ✔ Validation & sanitization improvements
-- ✔ Secure content flag
-- ✔ Core cleanup for better performance
+* [x] More field types
+* [x] Validation & sanitization improvements
+* [x] Secure content flag
+* [x] Core cleanup for better performance
 
 ---
 
