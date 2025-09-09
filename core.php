@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Multi Secure Dynamic CPTs
  * Description: A plugin to create dynamic CPTs with secure form submission to a custom database table.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: Volkan Kücükbudak
  */
 
@@ -44,12 +44,14 @@ class MultiSecureDynamicCPT {
         'title' => [
             'label' => 'Title',
             'type' => 'text',
-            'required' => true
+            'required' => true,
+            'is_title' => true
         ],
         'content' => [
             'label' => 'Content',
             'type' => 'textarea',
-            'required' => false
+            'required' => false,
+            'is_content' => true
         ],
         'email' => [
             'label' => 'Contact Email',
@@ -326,7 +328,7 @@ class MultiSecureDynamicCPT {
                         <th><label for="new-cpt-fields"><?php _e('Form Fields (JSON)', 'multi-secure-cpt'); ?></label></th>
                         <td>
                             <textarea id="new-cpt-fields" rows="8" cols="60" placeholder='<?php echo esc_attr(json_encode($this->default_fields, JSON_PRETTY_PRINT)); ?>'></textarea>
-                            <p class="description"><?php _e('Define custom fields in JSON format or use default fields', 'multi-secure-cpt'); ?></p>
+                            <p class="description"><?php _e('Define custom fields. Use "is_title": true and "is_content": true to map fields to the post title and content.', 'multi-secure-cpt'); ?></p>
                             <p>
                                 <button type="button" id="load-default-fields" class="button"><?php _e('Load Default Fields', 'multi-secure-cpt'); ?></button>
                                 <button type="button" id="validate-json" class="button"><?php _e('Validate JSON', 'multi-secure-cpt'); ?></button>
@@ -884,11 +886,6 @@ class MultiSecureDynamicCPT {
 
         if ($post_id && is_array($meta_data)) {
             foreach ($meta_data as $key => $value) {
-                // Exclude title and content from being saved as post meta
-                if ($key === 'title' || $key === 'content') {
-                    continue;
-                }
-
                 // Check if the value is a JSON string before attempting to decode
                 $decoded_value = json_decode($value, true);
 
@@ -897,7 +894,7 @@ class MultiSecureDynamicCPT {
                     update_post_meta($post_id, sanitize_key($key), $decoded_value);
                 } else {
                     // It's a simple string, sanitize and save
-                    update_post_meta($post_id, sanitize_key($key), sanitize_text_field($value));
+                    update_post_meta($post_id, sanitize_key($key), $value);
                 }
             }
         }
@@ -950,7 +947,8 @@ class MultiSecureDynamicCPT {
                                 echo '<textarea ' . $attributes . '></textarea>';
                                 break;
                             case 'select':
-                                echo '<select ' . $attributes;
+                                $select_attributes = 'name="' . esc_attr($field_name) . (!empty($field_config['multiple']) ? '[]' : '') . '" id="' . esc_attr($field_name) . '"' . $required;
+                                echo '<select ' . $select_attributes;
                                 if (!empty($field_config['multiple'])) {
                                     echo ' multiple';
                                 }
@@ -1098,11 +1096,13 @@ class MultiSecureDynamicCPT {
             .secure-cpt-form .radio-label {
                 display: block;
                 margin-bottom: 5px;
+                font-weight: normal;
             }
 
             .secure-cpt-form input[type="checkbox"],
             .secure-cpt-form input[type="radio"] {
                 margin-right: 5px;
+                vertical-align: middle;
             }
         </style>
         <?php
@@ -1133,28 +1133,49 @@ class MultiSecureDynamicCPT {
         }
 
         $form_fields = json_decode($cpt_data['form_fields'], true);
+        
+        // Determine which fields map to title and content
+        $title_key = 'title'; // default
+        $content_key = 'content'; // default
+        foreach ($form_fields as $key => $config) {
+            if (!empty($config['is_title'])) {
+                $title_key = $key;
+            }
+            if (!empty($config['is_content'])) {
+                $content_key = $key;
+            }
+        }
+
         $title = '';
         $content = '';
         $meta_data = [];
 
         foreach ($form_fields as $key => $config) {
-            $value = '';
+            $value = null;
             if (isset($_POST[$key])) {
                 if (is_array($_POST[$key])) {
                     $value = array_map('sanitize_text_field', wp_unslash($_POST[$key]));
                 } else {
-                    $value = sanitize_text_field(wp_unslash($_POST[$key]));
+                    // Allow more tags for content field
+                    if($key === $content_key) {
+                        $value = wp_kses_post(wp_unslash($_POST[$key]));
+                    } else {
+                        $value = sanitize_text_field(wp_unslash($_POST[$key]));
+                    }
                 }
             }
             if (!empty($config['required']) && empty($value)) {
                 wp_send_json_error(['message' => ($config['label'] ?? $key) . ' is required.'], 400);
             }
-            if ($key === 'title') {
+            
+            if ($key === $title_key) {
                 $title = $value;
-            } elseif ($key === 'content') {
+            } elseif ($key === $content_key) {
                 $content = $value;
             } else {
-                $meta_data[$key] = $value;
+                if ($value !== null) {
+                    $meta_data[$key] = $value;
+                }
             }
         }
 
@@ -1204,21 +1225,30 @@ class MultiSecureDynamicCPT {
         while ($query->have_posts()) {
             $query->the_post();
             
-            $entry = $this->get_entry_by_post_id(get_the_ID());
-            $meta_data = $entry ? json_decode($entry['meta_data'], true) : [];
-
             echo '<div class="cpt-list-item">';
             echo '<h3><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>';
             echo '<div class="cpt-list-content">' . get_the_excerpt() . '</div>';
 
-            if (!empty($meta_data)) {
+            $cpt_data = $this->get_cpt_by_key($atts['cpt']);
+            if ($cpt_data) {
+                $form_fields = json_decode($cpt_data['form_fields'], true);
+                $title_key = 'title';
+                $content_key = 'content';
+                 foreach ($form_fields as $key => $config) {
+                    if (!empty($config['is_title'])) $title_key = $key;
+                    if (!empty($config['is_content'])) $content_key = $key;
+                }
+
                 echo '<ul class="cpt-meta-list">';
-                foreach ($meta_data as $key => $value) {
-                    // Check if value is an array (from multiple select/checkboxes)
-                    if (is_array($value)) {
-                        $value = implode(', ', $value);
+                foreach ($form_fields as $key => $config) {
+                    if ($key === $title_key || $key === $content_key) continue;
+                    $value = get_post_meta(get_the_ID(), $key, true);
+                    if ($value) {
+                         if (is_array($value)) {
+                            $value = implode(', ', $value);
+                        }
+                        echo '<li><strong>' . esc_html($config['label'] ?? ucfirst(str_replace('_', ' ', $key))) . ':</strong> ' . esc_html($value) . '</li>';
                     }
-                    echo '<li><strong>' . esc_html(ucfirst(str_replace('_', ' ', $key))) . ':</strong> ' . esc_html($value) . '</li>';
                 }
                 echo '</ul>';
             }
@@ -1235,26 +1265,35 @@ class MultiSecureDynamicCPT {
         }
 
         $post_id = get_the_ID();
-        $entry = $this->get_entry_by_post_id($post_id);
-        if (!$entry) {
-            return $content;
-        }
+        $post_type = get_post_type($post_id);
 
-        $meta_data = json_decode($entry['meta_data'], true);
-        if (empty($meta_data)) {
-            return $content;
+        $cpt_data = $this->get_cpt_by_key($post_type);
+        if (!$cpt_data) return $content;
+
+        $form_fields = json_decode($cpt_data['form_fields'], true);
+        if (empty($form_fields)) return $content;
+        
+        $title_key = 'title';
+        $content_key = 'content';
+        foreach ($form_fields as $key => $config) {
+            if (!empty($config['is_title'])) $title_key = $key;
+            if (!empty($config['is_content'])) $content_key = $key;
         }
 
         ob_start();
         echo '<div class="secure-entry-meta">';
         echo '<h2>' . __('Additional Information', 'multi-secure-cpt') . '</h2>';
         echo '<ul>';
-        foreach ($meta_data as $key => $value) {
-            // Check if value is an array (from multiple select/checkboxes)
-            if (is_array($value)) {
-                $value = implode(', ', $value);
+        foreach ($form_fields as $key => $config) {
+            if ($key === $title_key || $key === $content_key) continue;
+
+            $value = get_post_meta($post_id, $key, true);
+            if ($value) {
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
+                echo '<li><strong>' . esc_html($config['label'] ?? ucfirst(str_replace('_', ' ', $key))) . ':</strong> ' . esc_html($value) . '</li>';
             }
-            echo '<li><strong>' . esc_html(ucfirst(str_replace('_', ' ', $key))) . ':</strong> ' . esc_html($value) . '</li>';
         }
         echo '</ul>';
         echo '</div>';
@@ -1280,40 +1319,31 @@ class MultiSecureDynamicCPT {
 
     public function render_custom_meta_box($post) {
         $cpt_key = $post->post_type;
-        $entry = $this->get_entry_by_post_id($post->ID);
-        
         $cpt_data = $this->get_cpt_by_key($cpt_key);
         if (!$cpt_data) return;
+
         $form_fields = json_decode($cpt_data['form_fields'], true);
         
-        $meta_data = [];
-
-        if ($entry) {
-            $meta_data = json_decode($entry['meta_data'], true);
-        } else {
-            // If no secure entry exists, load meta from post_meta table
-            $post_meta = get_post_meta($post->ID);
-            foreach ($form_fields as $field_name => $field_config) {
-                if ($field_name === 'title' || $field_name === 'content') continue;
-                if (isset($post_meta[$field_name])) {
-                    $meta_data[$field_name] = maybe_unserialize($post_meta[$field_name][0]);
-                }
-            }
+        $title_key = 'title';
+        $content_key = 'content';
+        foreach ($form_fields as $key => $config) {
+            if (!empty($config['is_title'])) $title_key = $key;
+            if (!empty($config['is_content'])) $content_key = $key;
         }
-
+        
         wp_nonce_field('save_custom_meta', 'custom_meta_nonce');
         
         foreach ($form_fields as $field_name => $field_config) {
-            if ($field_name === 'title' || $field_name === 'content') continue;
+            if ($field_name === $title_key || $field_name === $content_key) continue;
             
-            $value = isset($meta_data[$field_name]) ? $meta_data[$field_name] : '';
+            $value = get_post_meta($post->ID, $field_name, true);
             $field_type = $field_config['type'] ?? 'text';
             $placeholder = !empty($field_config['placeholder']) ? ' placeholder="' . esc_attr($field_config['placeholder']) . '"' : '';
 
             ?>
             <div class="form-field" style="margin-bottom:10px;">
-                <label for="<?php echo esc_attr($field_name); ?>">
-                    <strong><?php echo esc_html($field_config['label'] ?? $field_name); ?></strong>
+                <label for="<?php echo esc_attr($field_name); ?>" style="display:block; font-weight:bold; margin-bottom:5px;">
+                    <?php echo esc_html($field_config['label'] ?? $field_name); ?>
                 </label>
                 <?php switch ($field_type) {
                     case 'textarea':
@@ -1338,7 +1368,7 @@ class MultiSecureDynamicCPT {
                         if (!empty($field_config['options'])) {
                             foreach ($field_config['options'] as $option) {
                                 $checked = in_array($option['value'], $current_values) ? ' checked' : '';
-                                echo '<label class="checkbox-label" style="display: block; margin-bottom: 5px;">';
+                                echo '<label class="checkbox-label" style="display: block; margin-bottom: 5px; font-weight:normal;">';
                                 echo '<input type="checkbox" name="' . esc_attr($field_name) . '[]" value="' . esc_attr($option['value']) . '"' . $checked . '> ';
                                 echo esc_html($option['label']);
                                 echo '</label>';
@@ -1349,7 +1379,7 @@ class MultiSecureDynamicCPT {
                         if (!empty($field_config['options'])) {
                             foreach ($field_config['options'] as $option) {
                                 $checked = ($value === $option['value']) ? ' checked' : '';
-                                echo '<label class="radio-label" style="display: block; margin-bottom: 5px;">';
+                                echo '<label class="radio-label" style="display: block; margin-bottom: 5px; font-weight:normal;">';
                                 echo '<input type="radio" name="' . esc_attr($field_name) . '" value="' . esc_attr($option['value']) . '"' . $checked . '> ';
                                 echo esc_html($option['label']);
                                 echo '</label>';
@@ -1376,34 +1406,30 @@ class MultiSecureDynamicCPT {
         if (!$cpt_data) return;
 
         $form_fields = json_decode($cpt_data['form_fields'], true);
-        $meta_data = [];
-
-        foreach ($form_fields as $field_name => $field_config) {
-            if ($field_name === 'title' || $field_name === 'content') continue;
-            
-            if (isset($_POST[$field_name])) {
-                 if (is_array($_POST[$field_name])) {
-                    $meta_data[$field_name] = array_map('sanitize_text_field', wp_unslash($_POST[$field_name]));
-                } else {
-                    $meta_data[$field_name] = sanitize_text_field(wp_unslash($_POST[$field_name]));
-                }
-                update_post_meta($post_id, $field_name, $meta_data[$field_name]);
-            } else {
-                // Handle unchecked checkboxes
-                if (($field_config['type'] ?? 'text') === 'checkbox') {
-                    $meta_data[$field_name] = [];
-                    update_post_meta($post_id, $field_name, []);
-                }
-            }
+        
+        $title_key = 'title';
+        $content_key = 'content';
+        foreach ($form_fields as $key => $config) {
+            if (!empty($config['is_title'])) $title_key = $key;
+            if (!empty($config['is_content'])) $content_key = $key;
         }
 
-        $pdo = $this->get_pdo_connection();
-        if ($pdo) {
-            try {
-                $stmt = $pdo->prepare("UPDATE {$this->table_name} SET meta_data = ?, updated_at = NOW() WHERE wp_post_id = ?");
-                $stmt->execute([json_encode($meta_data), $post_id]);
-            } catch (PDOException $e) {
-                error_log('Error saving custom meta: ' . $e->getMessage());
+        foreach ($form_fields as $field_name => $field_config) {
+            if ($field_name === $title_key || $field_name === $content_key) continue;
+            
+            if (isset($_POST[$field_name])) {
+                $value = null;
+                if (is_array($_POST[$field_name])) {
+                    $value = array_map('sanitize_text_field', wp_unslash($_POST[$field_name]));
+                } else {
+                    $value = sanitize_text_field(wp_unslash($_POST[$field_name]));
+                }
+                update_post_meta($post_id, $field_name, $value);
+            } else {
+                // Handle unchecked checkboxes by deleting the meta
+                if (($field_config['type'] ?? 'text') === 'checkbox') {
+                    delete_post_meta($post_id, $field_name);
+                }
             }
         }
     }
