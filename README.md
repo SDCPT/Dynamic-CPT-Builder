@@ -1,4 +1,3 @@
-# Secure & Dynamic CPT Builder
 ##### Version: 2.3.0
 
 ![SDCPT](screenshot.jpg)
