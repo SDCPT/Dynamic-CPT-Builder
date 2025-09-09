@@ -73,7 +73,30 @@ Here is a basic JSON example for your fields:
 }
 ````
 
-note: variable  "content" is for cpt post content. you can use other text areas but they will be shown only in block/wigets.
+note: variable  "content" is for cpt post content. you can use other text areas but they will be shown only in block/wigets/archives or single view
+
+if you want only as cpt for posts its enought to use below by generating an CPT
+
+```json
+{
+    "title": {
+        "label": "Title",
+        "type": "text",
+        "required": true,
+        "is_title": true
+    },
+    "content": {
+        "label": "Content",
+        "type": "textarea",
+        "required": false,
+        "is_content": true
+    }
+}
+````
+
+
+
+
 
 ### Display a Form on the Frontend
 
