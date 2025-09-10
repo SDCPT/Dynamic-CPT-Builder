@@ -1,4 +1,3 @@
-###### WordPress Plugins by Volkan Sah - Simple codings (Realesed 27.08.2024)
 ![WordPress](https://img.shields.io/badge/WordPress-Compatible-blue.svg)
 ![Version](https://img.shields.io/badge/version-2.3.0-orange.svg)
 ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)
