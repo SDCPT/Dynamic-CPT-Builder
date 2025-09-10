@@ -1,4 +1,4 @@
-<?php // note: stable core 1.0.7
+<?php 
 /**
  * Plugin Name: Multi Secure Dynamic CPTs
  * Description: A plugin to create dynamic CPTs with secure form submission to a custom database table.
