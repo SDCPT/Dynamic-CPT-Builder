@@ -1,6 +1,6 @@
 
 ![WordPress](https://img.shields.io/badge/WordPress-Compatible-blue.svg)
-![Version](https://img.shields.io/badge/version-2.3.0-orange.svg)
+![Version](https://img.shields.io/badge/version-2.5.0-orange.svg)
 ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)
 [![Stars](https://img.shields.io/github/stars/SDCPT/Secure-Dynamic-CPT-Builder)](https://github.com/SDCPT/Secure-Dynamic-CPT-Builder)
 ![Forks](https://img.shields.io/github/forks/SDCPT/Secure-Dynamic-CPT-Builder)
@@ -143,19 +143,19 @@ Use the shortcode:
 ## 🛠 Roadmap
 
 * [ ] Import/Export CPT configurations
-* [ ] Full REST API support
-* [ ] Enable/disable front-end form per CPT
-* [ ] Enable/disable entry listing per CPT
-* [ ] CSS simplification (reduce custom UI, inherit theme styles)
-* [ ] Separate CSS files for `admin.css` and `public.css`
-* [ ] Default template parts for single and archive views
-* [ ] Fix post publish from Manage Entries (draft/trash works fine)
+* [ ] Enable/disable front-end form per CPT (maybe)
+* [ ] Enable/disable entry listing per CPT (maybe)
+* [ ] Use Gutenberg for customs fields
+
 
 **Done so far:**
 * [x] More field types
 * [x] Validation & sanitization improvements
 * [x] Secure content flag
 * [x] Core cleanup for better performance
+* [x] Fix post publish from Manage Entries (draft/trash works fine)
+* [x] CSS simplification (reduce custom UI, inherit theme styles)
+* [x] Full REST API support
 
 ---
 
