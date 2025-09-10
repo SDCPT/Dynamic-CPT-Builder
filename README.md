@@ -4,7 +4,6 @@
 ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)
 [![Stars](https://img.shields.io/github/stars/SDCPT/Secure-Dynamic-CPT-Builder)](https://github.com/SDCPT/Secure-Dynamic-CPT-Builder)
 ![Forks](https://img.shields.io/github/forks/SDCPT/Secure-Dynamic-CPT-Builder)
-![SDCPT](screenshot.jpg)
 
 > Slim & powerfull solution for creating multiple Custom Post Types (CPTs) –  simple, clean, and secure with real PHP power.
 
