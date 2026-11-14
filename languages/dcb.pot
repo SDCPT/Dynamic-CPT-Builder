@@ -1,0 +1,237 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Dynamic CPT Builder 0.1.0\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: dcb\n"
+
+#: includes/class-admin.php:29 includes/class-admin.php:30
+msgid "CPT Builder"
+msgstr ""
+
+#: includes/class-admin.php:49 includes/class-admin.php:92
+msgid "You do not have permission."
+msgstr ""
+
+#: includes/class-admin.php:112
+msgid "Dynamic CPT Builder"
+msgstr ""
+
+#: includes/class-admin.php:116
+msgid "Saved."
+msgstr ""
+
+#: includes/class-admin.php:120
+msgid "Definition removed. Existing posts are kept in the database."
+msgstr ""
+
+#: includes/class-admin.php:138
+msgid ""
+"Names and labels can be translated with your translation plugin (Polylang: "
+"Languages → Translations, group \"Dynamic CPT Builder\")."
+msgstr ""
+
+#: includes/class-admin.php:141 includes/class-admin.php:220
+msgid "Add new CPT"
+msgstr ""
+
+#: includes/class-admin.php:145
+msgid "No CPTs created yet."
+msgstr ""
+
+#: includes/class-admin.php:151
+msgid "Name"
+msgstr ""
+
+#: includes/class-admin.php:152 includes/class-admin.php:228
+msgid "Key"
+msgstr ""
+
+#: includes/class-admin.php:153
+msgid "Slug"
+msgstr ""
+
+#: includes/class-admin.php:154 includes/class-admin.php:258
+msgid "Fields"
+msgstr ""
+
+#: includes/class-admin.php:155
+msgid "Shortcode"
+msgstr ""
+
+#: includes/class-admin.php:156
+msgid "Actions"
+msgstr ""
+
+#: includes/class-admin.php:167
+msgid "Entries"
+msgstr ""
+
+#: includes/class-admin.php:168
+msgid "Edit"
+msgstr ""
+
+#: includes/class-admin.php:170
+msgid ""
+"Really remove this definition? The posts stay in the database but become "
+"invisible until you create the CPT again with the same key."
+msgstr ""
+
+#: includes/class-admin.php:174
+msgid "Remove"
+msgstr ""
+
+#: includes/class-admin.php:187
+msgid "CPT not found."
+msgstr ""
+
+#: includes/class-admin.php:220
+msgid "Edit CPT"
+msgstr ""
+
+#: includes/class-admin.php:232
+msgid "2 to 20 characters: a-z, 0-9, _. Cannot be changed later."
+msgstr ""
+
+#: includes/class-admin.php:236
+msgid "Name (plural)"
+msgstr ""
+
+#: includes/class-admin.php:240
+msgid "Name (singular)"
+msgstr ""
+
+#: includes/class-admin.php:244
+msgid "URL slug"
+msgstr ""
+
+#: includes/class-admin.php:247
+msgid "Permalinks are refreshed automatically after changes."
+msgstr ""
+
+#: includes/class-admin.php:251
+msgid "Menu icon"
+msgstr ""
+
+#: includes/class-admin.php:254
+msgid "Dashicons list"
+msgstr ""
+
+#: includes/class-admin.php:262
+msgid "One line per field:"
+msgstr ""
+
+#: includes/class-admin.php:267
+msgid ""
+"Types: %s. Options (comma-separated) only for \"select\". The last column, "
+"\"neutral\" or \"translate\", controls whether the field is translated per "
+"language (default: only textarea is translated)."
+msgstr ""
+
+#: includes/class-admin.php:272 includes/class-admin.php:280
+msgid "Example:"
+msgstr ""
+
+#: includes/class-admin.php:277
+msgid "Taxonomies"
+msgstr ""
+
+#: includes/class-admin.php:280
+msgid "One line per taxonomy:"
+msgstr ""
+
+#: includes/class-admin.php:285
+msgid "Save"
+msgstr ""
+
+#: includes/class-admin.php:285
+msgid "Create CPT"
+msgstr ""
+
+#: includes/class-admin.php:286
+msgid "Cancel"
+msgstr ""
+
+#: includes/class-frontend.php:40
+msgid "Yes"
+msgstr ""
+
+#: includes/class-frontend.php:86
+msgid "dcb_list: unknown CPT."
+msgstr ""
+
+#: includes/class-frontend.php:98
+msgid "No entries found."
+msgstr ""
+
+#: includes/class-metabox.php:29
+msgid "Additional fields"
+msgstr ""
+
+#: includes/class-metabox.php:74
+msgid "Language-neutral: same value in all translations."
+msgstr ""
+
+#: includes/class-registry.php:118
+msgid "Add %s"
+msgstr ""
+
+#: includes/class-registry.php:119
+msgid "Edit %s"
+msgstr ""
+
+#: includes/class-registry.php:255
+msgid "Fields, line %d: key is missing."
+msgstr ""
+
+#: includes/class-registry.php:259
+msgid "Fields, line %1$d: key \"%2$s\" is used twice."
+msgstr ""
+
+#: includes/class-registry.php:263
+msgid "Fields, line %1$d: unknown type \"%2$s\"."
+msgstr ""
+
+#: includes/class-registry.php:278
+msgid "Fields, line %d: \"select\" needs options (comma-separated)."
+msgstr ""
+
+#: includes/class-registry.php:285
+msgid "Fields, line %1$d: unknown flag \"%2$s\" (use \"neutral\" or \"translate\")."
+msgstr ""
+
+#: includes/class-registry.php:300
+msgid "At most %d fields allowed."
+msgstr ""
+
+#: includes/class-registry.php:321
+msgid "Taxonomies, line %d: key is missing or duplicated."
+msgstr ""
+
+#: includes/class-registry.php:326
+msgid "Taxonomies, line %1$d: \"%2$s\" is already taken."
+msgstr ""
+
+#: includes/class-registry.php:337
+msgid "At most %d taxonomies allowed."
+msgstr ""
+
+#: includes/class-registry.php:367
+msgid "Key: 2 to 20 characters, only a-z, 0-9 and _, starting with a letter."
+msgstr ""
+
+#: includes/class-registry.php:369
+msgid "This key already exists (WordPress core types are reserved too)."
+msgstr ""
+
+#: includes/class-registry.php:376
+msgid "Plural name, singular name and URL slug are required."
+msgstr ""
+
+#: includes/class-registry.php:380
+msgid "This URL slug is already used by another CPT."
+msgstr ""
