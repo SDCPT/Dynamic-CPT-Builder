@@ -68,14 +68,4 @@ Privacy: the submitter's email and the time of consent are stored in private met
 AGPL-3.0-or-later, see `LICENSE`.
 
 ---
-
-## Deutsch (Kurzfassung)
-
-**Ausführliche Anleitung für Einsteiger mit allen Feldtypen und Beispielen: siehe `ANLEITUNG.md`.**
-
-Legt Custom Post Types, Taxonomien und Felder im Backend an, ohne Code. Felder werden zeilenweise definiert: `key|Label|typ|optionen|flag`. Das Flag `neutral` (in allen Sprachen gleich, wird synchronisiert) oder `translate` (pro Sprache übersetzt) bestimmt das Verhalten mit Polylang. Standard: nur `textarea` wird übersetzt. Die Oberfläche ist auf Deutsch übersetzt. „Entfernen" löscht nur die Definition, nicht die Beiträge.
-
-**Einreichungsformular:** Pro CPT "Öffentliche Einreichungen" aktivieren und `[dcb_submit]` auf eine Seite setzen. Das Formular passt sich der gewählten Kategorie an. Einträge landen immer als "Ausstehend". Uploads: nur echte JPG/PNG/WebP (max. 2 MB), geprüft und neu kodiert; Skripte, SVG, Archive etc. werden abgelehnt.
-
-## Türkce kizazi
-
+ soon in türkisch and german
