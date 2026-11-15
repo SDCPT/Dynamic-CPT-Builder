@@ -17,11 +17,15 @@ class DCB_Metabox {
 	}
 
 	public function init() {
-		add_action( 'add_meta_boxes', array( $this, 'add' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'save' ), 10, 2 );
 	}
 
-	public function add() {
+	public function add( $post_type = '', $post = null ) {
+		// Entries sent in by visitors: show who sent them (moderators only see this, visitors never do).
+		if ( $post instanceof WP_Post && $this->registry->get( $post_type ) && get_post_meta( $post->ID, '_dcb_submitter_email', true ) ) {
+			add_meta_box( 'dcb_submitter', __( 'Submitted by a visitor', 'dcb' ), array( $this, 'render_submitter' ), $post_type, 'side', 'high' );
+		}
 		foreach ( $this->registry->all() as $key => $def ) {
 			// "custom-fields" support is needed for REST, but the raw meta box would only duplicate our fields.
 			remove_meta_box( 'postcustom', $key, 'normal' );
@@ -78,6 +82,16 @@ class DCB_Metabox {
 			echo '</td></tr>';
 		}
 		echo '</table>';
+	}
+
+	public function render_submitter( $post ) {
+		$email = (string) get_post_meta( $post->ID, '_dcb_submitter_email', true );
+		$when  = (string) get_post_meta( $post->ID, '_dcb_consent_at', true );
+		echo '<p><strong>' . esc_html__( 'Email:', 'dcb' ) . '</strong> ' . esc_html( $email ) . '</p>';
+		if ( '' !== $when ) {
+			echo '<p><strong>' . esc_html__( 'Consent given:', 'dcb' ) . '</strong> ' . esc_html( $when ) . '</p>';
+		}
+		echo '<p class="description">' . esc_html__( 'Review the entry, then publish it or move it to the trash. The email address is never shown on the website.', 'dcb' ) . '</p>';
 	}
 
 	public function save( $post_id, $post ) {

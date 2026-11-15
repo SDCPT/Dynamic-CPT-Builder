@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Dynamic CPT Builder 0.1.0\n"
+"Project-Id-Version: Dynamic CPT Builder 0.5.0\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -18,31 +18,31 @@ msgstr ""
 msgid "CPTs"
 msgstr "CPTs"
 
-#: includes/class-admin.php:52 includes/class-admin.php:109
-#: includes/class-admin.php:144 includes/class-design.php:219
+#: includes/class-admin.php:52 includes/class-admin.php:111
+#: includes/class-admin.php:146 includes/class-design.php:219
 msgid "You do not have permission."
 msgstr "Keine Berechtigung."
 
-#: includes/class-admin.php:164
+#: includes/class-admin.php:166
 msgid "Dynamic CPT Builder"
 msgstr ""
 
-#: includes/class-admin.php:168
+#: includes/class-admin.php:170
 msgid "This URL base is reserved by WordPress. Please choose another one."
 msgstr ""
 "Diese URL-Basis ist von WordPress reserviert. Bitte wähle eine andere."
 
-#: includes/class-admin.php:172
+#: includes/class-admin.php:174
 msgid "Saved."
 msgstr "Gespeichert."
 
-#: includes/class-admin.php:176
+#: includes/class-admin.php:178
 msgid "Definition removed. Existing posts are kept in the database."
 msgstr ""
 "Definition entfernt. Bereits angelegte Beiträge bleiben in der Datenbank "
 "erhalten."
 
-#: includes/class-admin.php:194
+#: includes/class-admin.php:196
 msgid ""
 "Names and labels can be translated with your translation plugin (Polylang: "
 "Languages → Translations, group \"Dynamic CPT Builder\")."
@@ -51,15 +51,15 @@ msgstr ""
 "übersetzen (Polylang: Sprachen → Übersetzungen, Gruppe \"Dynamic CPT "
 "Builder\")."
 
-#: includes/class-admin.php:199
+#: includes/class-admin.php:201
 msgid "URL base"
 msgstr "URL-Basis"
 
-#: includes/class-admin.php:201 includes/class-admin.php:424
+#: includes/class-admin.php:203 includes/class-admin.php:438
 msgid "Save"
 msgstr "Speichern"
 
-#: includes/class-admin.php:202
+#: includes/class-admin.php:204
 msgid ""
 "Prefix for all CPT addresses, e.g. \"p\" gives /p/bots/. Leave empty for no "
 "prefix."
@@ -67,47 +67,47 @@ msgstr ""
 "Präfix für alle CPT-Adressen, z. B. \"p\" ergibt /p/bots/. Leer lassen für "
 "kein Präfix."
 
-#: includes/class-admin.php:205 includes/class-admin.php:286
+#: includes/class-admin.php:207 includes/class-admin.php:288
 msgid "Add new CPT"
 msgstr "Neuen CPT anlegen"
 
-#: includes/class-admin.php:209
+#: includes/class-admin.php:211
 msgid "No CPTs created yet."
 msgstr "Noch keine CPTs angelegt."
 
-#: includes/class-admin.php:215
+#: includes/class-admin.php:217
 msgid "Name"
 msgstr ""
 
-#: includes/class-admin.php:216 includes/class-admin.php:294
+#: includes/class-admin.php:218 includes/class-admin.php:296
 msgid "Key"
 msgstr ""
 
-#: includes/class-admin.php:217
+#: includes/class-admin.php:219
 msgid "Address"
 msgstr "Adresse"
 
-#: includes/class-admin.php:218 includes/class-admin.php:324
+#: includes/class-admin.php:220 includes/class-admin.php:326
 msgid "Fields"
 msgstr "Felder"
 
-#: includes/class-admin.php:219
+#: includes/class-admin.php:221
 msgid "Shortcode"
 msgstr ""
 
-#: includes/class-admin.php:220
+#: includes/class-admin.php:222
 msgid "Actions"
 msgstr "Aktionen"
 
-#: includes/class-admin.php:231
+#: includes/class-admin.php:233
 msgid "Entries"
 msgstr "Einträge"
 
-#: includes/class-admin.php:232
+#: includes/class-admin.php:234
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: includes/class-admin.php:234
+#: includes/class-admin.php:236
 msgid ""
 "Really remove this definition? The posts stay in the database but become "
 "invisible until you create the CPT again with the same key."
@@ -115,51 +115,51 @@ msgstr ""
 "Definition wirklich entfernen? Die Beiträge bleiben in der Datenbank, sind "
 "aber nicht mehr sichtbar, bis du den CPT wieder mit demselben Key anlegst."
 
-#: includes/class-admin.php:238
+#: includes/class-admin.php:240
 msgid "Remove"
 msgstr "Entfernen"
 
-#: includes/class-admin.php:251
+#: includes/class-admin.php:253
 msgid "CPT not found."
 msgstr "CPT nicht gefunden."
 
-#: includes/class-admin.php:286
+#: includes/class-admin.php:288
 msgid "Edit CPT"
 msgstr "CPT bearbeiten"
 
-#: includes/class-admin.php:298
+#: includes/class-admin.php:300
 msgid "2 to 20 characters: a-z, 0-9, _. Cannot be changed later."
 msgstr "2 bis 20 Zeichen: a-z, 0-9, _. Lässt sich später nicht mehr ändern."
 
-#: includes/class-admin.php:302
+#: includes/class-admin.php:304
 msgid "Name (plural)"
 msgstr "Name (Plural)"
 
-#: includes/class-admin.php:306
+#: includes/class-admin.php:308
 msgid "Name (singular)"
 msgstr "Name (Singular)"
 
-#: includes/class-admin.php:310
+#: includes/class-admin.php:312
 msgid "URL slug"
 msgstr "URL-Slug"
 
-#: includes/class-admin.php:313
+#: includes/class-admin.php:315
 msgid "Permalinks are refreshed automatically after changes."
 msgstr "Nach Änderungen werden die Permalinks automatisch aktualisiert."
 
-#: includes/class-admin.php:317
+#: includes/class-admin.php:319
 msgid "Menu icon"
 msgstr "Menü-Icon"
 
-#: includes/class-admin.php:320
+#: includes/class-admin.php:322
 msgid "Dashicons list"
 msgstr "Dashicons-Liste"
 
-#: includes/class-admin.php:328
+#: includes/class-admin.php:330
 msgid "One line per field:"
 msgstr "Eine Zeile pro Feld:"
 
-#: includes/class-admin.php:333
+#: includes/class-admin.php:335
 msgid ""
 "Types: %s. Options (comma-separated) only for \"select\". The last column, "
 "\"neutral\" or \"translate\", controls whether the field is translated per "
@@ -169,48 +169,48 @@ msgstr ""
 "\"neutral\" oder \"translate\", legt fest, ob das Feld pro Sprache übersetzt"
 " wird (Standard: nur textarea wird übersetzt)."
 
-#: includes/class-admin.php:338 includes/class-admin.php:349
+#: includes/class-admin.php:340 includes/class-admin.php:351
 msgid "Example:"
 msgstr "Beispiel:"
 
-#: includes/class-admin.php:343
+#: includes/class-admin.php:345
 msgid "Taxonomies"
 msgstr "Taxonomien"
 
-#: includes/class-admin.php:347
+#: includes/class-admin.php:349
 msgid "One line per taxonomy:"
 msgstr "Eine Zeile pro Taxonomie:"
 
-#: includes/class-admin.php:348
+#: includes/class-admin.php:350
 msgid "Kind: \"category\" (hierarchical, default) or \"tags\" (flat, like tags)."
 msgstr ""
 "Art: \"category\" (hierarchisch, Standard) oder \"tags\" (flach, wie "
 "Schlagwörter)."
 
-#: includes/class-admin.php:354
+#: includes/class-admin.php:356
 msgid "Editor features"
 msgstr "Editor-Funktionen"
 
-#: includes/class-admin.php:363
+#: includes/class-admin.php:365
 msgid ""
 "Only switch on what this CPT needs. The additional fields above always work."
 msgstr ""
 "Aktiviere nur, was dieser CPT braucht. Die Zusatzfelder oben funktionieren "
 "immer."
 
-#: includes/class-admin.php:367
+#: includes/class-admin.php:369
 msgid "WordPress taxonomies"
 msgstr "WordPress-Taxonomien"
 
-#: includes/class-admin.php:371
+#: includes/class-admin.php:373
 msgid "Categories"
 msgstr "Kategorien"
 
-#: includes/class-admin.php:372
+#: includes/class-admin.php:374
 msgid "Tags"
 msgstr "Schlagwörter"
 
-#: includes/class-admin.php:375
+#: includes/class-admin.php:377
 msgid ""
 "Shares the built-in categories and tags with normal posts. For separate "
 "lists use your own taxonomies above."
@@ -218,27 +218,27 @@ msgstr ""
 "Teilt die eingebauten Kategorien und Schlagwörter mit normalen Beiträgen. "
 "Für getrennte Listen nutze deine eigenen Taxonomien oben."
 
-#: includes/class-admin.php:379
+#: includes/class-admin.php:381
 msgid "Behaviour"
 msgstr "Verhalten"
 
-#: includes/class-admin.php:383
+#: includes/class-admin.php:385
 msgid "Public (visible on the website)"
 msgstr "Öffentlich (auf der Website sichtbar)"
 
-#: includes/class-admin.php:384
+#: includes/class-admin.php:386
 msgid "Archive page (list of all entries)"
 msgstr "Archivseite (Liste aller Einträge)"
 
-#: includes/class-admin.php:385
+#: includes/class-admin.php:387
 msgid "Hierarchical (parent and child entries, like pages)"
 msgstr "Hierarchisch (Eltern- und Unterseiten, wie bei Seiten)"
 
-#: includes/class-admin.php:386
+#: includes/class-admin.php:388
 msgid "Block editor and REST API"
 msgstr "Block-Editor und REST-API"
 
-#: includes/class-admin.php:389
+#: includes/class-admin.php:391
 msgid ""
 "Hierarchical switches on \"Page attributes\" automatically. Without the "
 "block editor you get the classic editor."
@@ -246,27 +246,27 @@ msgstr ""
 "\"Hierarchisch\" aktiviert die \"Seiten-Attribute\" automatisch. Ohne Block-"
 "Editor erscheint der klassische Editor."
 
-#: includes/class-admin.php:393
+#: includes/class-admin.php:395
 msgid "List layout"
 msgstr "Listen-Layout"
 
-#: includes/class-admin.php:396
+#: includes/class-admin.php:398
 msgid "Design default"
 msgstr "Standard aus Design"
 
-#: includes/class-admin.php:397 includes/class-design.php:279
+#: includes/class-admin.php:399 includes/class-design.php:279
 msgid "List"
 msgstr "Liste"
 
-#: includes/class-admin.php:398 includes/class-design.php:280
+#: includes/class-admin.php:400 includes/class-design.php:280
 msgid "Cards"
 msgstr "Karten"
 
-#: includes/class-admin.php:399 includes/class-design.php:281
+#: includes/class-admin.php:401 includes/class-design.php:281
 msgid "Mosaic"
 msgstr "Mosaik"
 
-#: includes/class-admin.php:401
+#: includes/class-admin.php:403
 msgid ""
 "How the entries look in lists. The mosaic uses the featured image, so switch"
 " that feature on above."
@@ -274,19 +274,19 @@ msgstr ""
 "Wie die Einträge in Listen aussehen. Das Mosaik nutzt das Beitragsbild, "
 "aktiviere dafür oben die Funktion."
 
-#: includes/class-admin.php:405
+#: includes/class-admin.php:407
 msgid "Archive page"
 msgstr "Archiv-Seite"
 
-#: includes/class-admin.php:413
+#: includes/class-admin.php:415
 msgid "— none (use the theme archive) —"
 msgstr "— keine (Archiv des Themes nutzen) —"
 
-#: includes/class-admin.php:418
+#: includes/class-admin.php:420
 msgid "Create a new page for me"
 msgstr "Neue Seite für mich erstellen"
 
-#: includes/class-admin.php:419
+#: includes/class-admin.php:421
 msgid ""
 "The chosen page shows all entries below its own text, so you can write an "
 "intro. Its address becomes /base/slug/ (see the list). No shortcode needed."
@@ -295,51 +295,78 @@ msgstr ""
 "also einen Einleitungstext schreiben. Ihre Adresse wird /basis/slug/ (siehe "
 "Liste). Kein Shortcode nötig."
 
-#: includes/class-admin.php:424
+#: includes/class-admin.php:425
+msgid "Public submissions"
+msgstr "Öffentliche Einreichungen"
+
+#: includes/class-admin.php:429
+msgid "Visitors may submit entries with [dcb_submit]"
+msgstr "Besucher dürfen Einträge über [dcb_submit] einreichen"
+
+#: includes/class-admin.php:430
+msgid "Allow one image (needs \"Featured image\" above)"
+msgstr "Ein Bild erlauben (braucht \"Beitragsbild\" oben)"
+
+#: includes/class-admin.php:433
+msgid ""
+"The form shows exactly the fields of this CPT, and visitors choose the "
+"category if several CPTs accept submissions. Entries are always saved as "
+"\"pending\" and never published without your review. Uploads are limited to "
+"genuine JPG, PNG and WebP images (max. 2 MB), checked and re-encoded; "
+"scripts, SVG, archives and everything else are refused."
+msgstr ""
+"Das Formular zeigt genau die Felder dieses CPTs; nehmen mehrere CPTs "
+"Einreichungen an, wählen Besucher die Kategorie. Einträge werden immer als "
+"\"ausstehend\" gespeichert und nie ohne deine Prüfung veröffentlicht. "
+"Uploads sind auf echte JPG-, PNG- und WebP-Bilder (max. 2 MB) beschränkt, "
+"werden geprüft und neu kodiert; Skripte, SVG, Archive und alles andere wird "
+"abgelehnt."
+
+#: includes/class-admin.php:438
 msgid "Create CPT"
 msgstr "CPT anlegen"
 
-#: includes/class-admin.php:425
+#: includes/class-admin.php:439
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: includes/class-admin.php:433
+#: includes/class-admin.php:447
 msgid "Title"
 msgstr "Titel"
 
-#: includes/class-admin.php:434
+#: includes/class-admin.php:448
 msgid "Editor (main content)"
 msgstr "Editor (Hauptinhalt)"
 
-#: includes/class-admin.php:435
+#: includes/class-admin.php:449
 msgid "Featured image"
 msgstr "Beitragsbild"
 
-#: includes/class-admin.php:436
+#: includes/class-admin.php:450
 msgid "Excerpt"
 msgstr "Textauszug"
 
-#: includes/class-admin.php:437
+#: includes/class-admin.php:451
 msgid "Author"
 msgstr "Autor"
 
-#: includes/class-admin.php:438
+#: includes/class-admin.php:452
 msgid "Comments"
 msgstr "Kommentare"
 
-#: includes/class-admin.php:439
+#: includes/class-admin.php:453
 msgid "Trackbacks and pingbacks"
 msgstr "Trackbacks und Pingbacks"
 
-#: includes/class-admin.php:440
+#: includes/class-admin.php:454
 msgid "Revisions"
 msgstr "Revisionen"
 
-#: includes/class-admin.php:441
+#: includes/class-admin.php:455
 msgid "Page attributes (order, parent)"
 msgstr "Seiten-Attribute (Reihenfolge, Eltern-Eintrag)"
 
-#: includes/class-admin.php:442
+#: includes/class-admin.php:456
 msgid "Post formats"
 msgstr "Beitragsformate"
 
@@ -464,88 +491,245 @@ msgstr "Ja"
 msgid "dcb_list: unknown CPT."
 msgstr "dcb_list: unbekannter CPT."
 
-#: includes/class-metabox.php:31
+#: includes/class-metabox.php:27
+msgid "Submitted by a visitor"
+msgstr "Von einem Besucher eingereicht"
+
+#: includes/class-metabox.php:35
 msgid "Additional fields"
 msgstr "Zusatzfelder"
 
-#: includes/class-metabox.php:76
+#: includes/class-metabox.php:80
 msgid "Language-neutral: same value in all translations."
 msgstr "Sprachneutral: gleicher Wert in allen Übersetzungen."
 
-#: includes/class-registry.php:204
+#: includes/class-metabox.php:90
+msgid "Email:"
+msgstr "E-Mail:"
+
+#: includes/class-metabox.php:92
+msgid "Consent given:"
+msgstr "Einwilligung erteilt:"
+
+#: includes/class-metabox.php:94
+msgid ""
+"Review the entry, then publish it or move it to the trash. The email address"
+" is never shown on the website."
+msgstr ""
+"Prüfe den Eintrag und veröffentliche ihn oder verschiebe ihn in den "
+"Papierkorb. Die E-Mail-Adresse wird nie auf der Website angezeigt."
+
+#: includes/class-registry.php:208
 msgid "Add %s"
 msgstr "%s hinzufügen"
 
-#: includes/class-registry.php:205
+#: includes/class-registry.php:209
 msgid "Edit %s"
 msgstr "%s bearbeiten"
 
-#: includes/class-registry.php:354
+#: includes/class-registry.php:358
 msgid "Fields, line %d: key is missing."
 msgstr "Felder, Zeile %d: Key fehlt."
 
-#: includes/class-registry.php:358
+#: includes/class-registry.php:362
 msgid "Fields, line %1$d: key \"%2$s\" is used twice."
 msgstr "Felder, Zeile %1$d: Key \"%2$s\" kommt doppelt vor."
 
-#: includes/class-registry.php:362
+#: includes/class-registry.php:366
 msgid "Fields, line %1$d: unknown type \"%2$s\"."
 msgstr "Felder, Zeile %1$d: Unbekannter Typ \"%2$s\"."
 
-#: includes/class-registry.php:377
+#: includes/class-registry.php:381
 msgid "Fields, line %d: \"select\" needs options (comma-separated)."
 msgstr "Felder, Zeile %d: \"select\" braucht Optionen (Komma-getrennt)."
 
-#: includes/class-registry.php:384
+#: includes/class-registry.php:388
 msgid "Fields, line %1$d: unknown flag \"%2$s\" (use \"neutral\" or \"translate\")."
 msgstr ""
 "Felder, Zeile %1$d: Unbekanntes Flag \"%2$s\" (nutze \"neutral\" oder "
 "\"translate\")."
 
-#: includes/class-registry.php:399
+#: includes/class-registry.php:403
 msgid "At most %d fields allowed."
 msgstr "Maximal %d Felder erlaubt."
 
-#: includes/class-registry.php:423
+#: includes/class-registry.php:427
 msgid "Taxonomies, line %1$d: unknown kind \"%2$s\" (use \"category\" or \"tags\")."
 msgstr ""
 "Taxonomien, Zeile %1$d: Unbekannte Art \"%2$s\" (nutze \"category\" oder "
 "\"tags\")."
 
-#: includes/class-registry.php:427
+#: includes/class-registry.php:431
 msgid "Taxonomies, line %d: key is missing or duplicated."
 msgstr "Taxonomien, Zeile %d: Key fehlt oder doppelt."
 
-#: includes/class-registry.php:432
+#: includes/class-registry.php:436
 msgid "Taxonomies, line %1$d: \"%2$s\" is already taken."
 msgstr "Taxonomien, Zeile %1$d: \"%2$s\" ist bereits vergeben."
 
-#: includes/class-registry.php:444
+#: includes/class-registry.php:448
 msgid "At most %d taxonomies allowed."
 msgstr "Maximal %d Taxonomien erlaubt."
 
-#: includes/class-registry.php:474
+#: includes/class-registry.php:478
 msgid "Key: 2 to 20 characters, only a-z, 0-9 and _, starting with a letter."
 msgstr ""
 "Key: 2 bis 20 Zeichen, nur a-z, 0-9 und _, beginnt mit einem Buchstaben."
 
-#: includes/class-registry.php:476
+#: includes/class-registry.php:480
 msgid "This key already exists (WordPress core types are reserved too)."
 msgstr ""
 "Dieser Key existiert bereits (auch WordPress-eigene Typen sind gesperrt)."
 
-#: includes/class-registry.php:483
+#: includes/class-registry.php:487
 msgid "Plural name, singular name and URL slug are required."
 msgstr "Name (Plural), Name (Singular) und URL-Slug sind Pflicht."
 
-#: includes/class-registry.php:487
+#: includes/class-registry.php:491
 msgid "This URL slug is already used by another CPT."
 msgstr "Dieser URL-Slug wird schon von einem anderen CPT genutzt."
 
-#: includes/class-registry.php:511
+#: includes/class-registry.php:515
 msgid "The archive page must be a normal WordPress page."
 msgstr "Die Archiv-Seite muss eine normale WordPress-Seite sein."
 
-#: includes/class-registry.php:515
+#: includes/class-registry.php:519
 msgid "This page is already the archive page of another CPT."
 msgstr "Diese Seite ist bereits die Archiv-Seite eines anderen CPTs."
+
+#: includes/class-submit.php:86
+msgid "That was very fast. Please check your entry and send it again."
+msgstr ""
+"Das ging sehr schnell. Bitte prüfe deinen Eintrag und sende ihn erneut ab."
+
+#: includes/class-submit.php:89
+msgid "The form has expired. Please reload the page and try again."
+msgstr ""
+"Das Formular ist abgelaufen. Bitte lade die Seite neu und versuche es "
+"erneut."
+
+#: includes/class-submit.php:91
+msgid "The form could not be verified. Please reload the page and try again."
+msgstr ""
+"Das Formular konnte nicht geprüft werden. Bitte lade die Seite neu und "
+"versuche es erneut."
+
+#: includes/class-submit.php:124
+msgid "Please choose a valid category."
+msgstr "Bitte wähle eine gültige Kategorie."
+
+#: includes/class-submit.php:133
+msgid "Please enter a name or title."
+msgstr "Bitte gib einen Namen oder Titel ein."
+
+#: includes/class-submit.php:138
+msgid "Please enter a valid email address."
+msgstr "Bitte gib eine gültige E-Mail-Adresse ein."
+
+#: includes/class-submit.php:141
+msgid "Please agree to the storage and publication of your entry."
+msgstr "Bitte stimme der Speicherung und Veröffentlichung deines Eintrags zu."
+
+#: includes/class-submit.php:154
+msgid "The value for \"%s\" is not valid."
+msgstr "Der Wert für \"%s\" ist ungültig."
+
+#: includes/class-submit.php:193
+msgid "Too many submissions from your connection. Please try again later."
+msgstr ""
+"Zu viele Einreichungen von deiner Verbindung. Bitte versuche es später "
+"erneut."
+
+#: includes/class-submit.php:208
+msgid "We cannot accept new entries right now. Please try again later."
+msgstr ""
+"Wir können gerade keine neuen Einträge annehmen. Bitte versuche es später "
+"erneut."
+
+#: includes/class-submit.php:222
+msgid "The image could not be uploaded."
+msgstr "Das Bild konnte nicht hochgeladen werden."
+
+#: includes/class-submit.php:245
+msgid "Your entry could not be saved. Please try again later."
+msgstr ""
+"Dein Eintrag konnte nicht gespeichert werden. Bitte versuche es später "
+"erneut."
+
+#: includes/class-submit.php:318
+msgid "[%1$s] New submission: %2$s"
+msgstr "[%1$s] Neue Einreichung: %2$s"
+
+#: includes/class-submit.php:382
+msgid ""
+"dcb_submit: no CPT accepts submissions yet. Switch it on in the CPT "
+"settings."
+msgstr ""
+"dcb_submit: Noch kein CPT nimmt Einreichungen an. Schalte es in den CPT-"
+"Einstellungen ein."
+
+#: includes/class-submit.php:390
+msgid ""
+"Thank you! Your entry was received and will be published after it has been "
+"reviewed."
+msgstr ""
+"Danke! Dein Eintrag ist eingegangen und wird nach einer Prüfung "
+"veröffentlicht."
+
+#: includes/class-submit.php:407
+msgid "Leave this field empty"
+msgstr "Dieses Feld leer lassen"
+
+#: includes/class-submit.php:411
+msgid "I want to register as"
+msgstr "Ich möchte mich eintragen als"
+
+#: includes/class-submit.php:421
+msgid "Name / title"
+msgstr "Name / Titel"
+
+#: includes/class-submit.php:422
+msgid "Email (not published)"
+msgstr "E-Mail (wird nicht veröffentlicht)"
+
+#: includes/class-submit.php:434
+msgid "Description"
+msgstr "Beschreibung"
+
+#: includes/class-submit.php:437
+msgid "Image (JPG, PNG or WebP, max. 2 MB)"
+msgstr "Bild (JPG, PNG oder WebP, max. 2 MB)"
+
+#: includes/class-submit.php:442
+msgid ""
+"I agree that my entry is stored and, after review, published on this "
+"website. My email address is only used to contact me about my entry and is "
+"not published."
+msgstr ""
+"Ich bin einverstanden, dass mein Eintrag gespeichert und nach Prüfung auf "
+"dieser Website veröffentlicht wird. Meine E-Mail-Adresse wird nur genutzt, "
+"um mich zu meinem Eintrag zu kontaktieren, und nicht veröffentlicht."
+
+#: includes/class-submit.php:446
+msgid "Privacy policy"
+msgstr "Datenschutzerklärung"
+
+#: includes/class-submit.php:449
+msgid "Submit entry"
+msgstr "Eintrag absenden"
+
+#: includes/class-upload.php:108
+msgid "The image is too large (maximum 2 MB)."
+msgstr "Das Bild ist zu groß (maximal 2 MB)."
+
+#: includes/class-upload.php:110
+msgid "The image dimensions are not allowed."
+msgstr "Die Bildabmessungen sind nicht erlaubt."
+
+#: includes/class-upload.php:112
+msgid "The uploaded file is empty."
+msgstr "Die hochgeladene Datei ist leer."
+
+#: includes/class-upload.php:114
+msgid "Only genuine JPG, PNG or WebP images are allowed."
+msgstr "Es sind nur echte JPG-, PNG- oder WebP-Bilder erlaubt."

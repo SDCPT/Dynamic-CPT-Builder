@@ -87,6 +87,8 @@ class DCB_Admin {
 						'rest'         => ! empty( $in['rest'] ),
 						'archive_page' => isset( $in['archive_page'] ) ? absint( $in['archive_page'] ) : 0,
 						'layout'       => isset( $in['layout'] ) ? sanitize_key( $in['layout'] ) : '',
+						'submit'       => ! empty( $in['submit'] ),
+						'submit_image' => ! empty( $in['submit_image'] ),
 					),
 				),
 				60
@@ -417,6 +419,18 @@ class DCB_Admin {
 						?>
 						<?php $this->checkbox( 'archive_create', '1', false, __( 'Create a new page for me', 'dcb' ) ); ?>
 						<p class="description"><?php esc_html_e( 'The chosen page shows all entries below its own text, so you can write an intro. Its address becomes /base/slug/ (see the list). No shortcode needed.', 'dcb' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th><?php esc_html_e( 'Public submissions', 'dcb' ); ?></th>
+					<td>
+						<fieldset>
+							<?php
+							$this->checkbox( 'submit', '1', ! empty( $val['submit'] ), __( 'Visitors may submit entries with [dcb_submit]', 'dcb' ) );
+							$this->checkbox( 'submit_image', '1', ! empty( $val['submit_image'] ), __( 'Allow one image (needs "Featured image" above)', 'dcb' ) );
+							?>
+						</fieldset>
+						<p class="description"><?php esc_html_e( 'The form shows exactly the fields of this CPT, and visitors choose the category if several CPTs accept submissions. Entries are always saved as "pending" and never published without your review. Uploads are limited to genuine JPG, PNG and WebP images (max. 2 MB), checked and re-encoded; scripts, SVG, archives and everything else are refused.', 'dcb' ); ?></p>
 					</td>
 				</tr>
 			</table>

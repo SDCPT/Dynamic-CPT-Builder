@@ -78,6 +78,8 @@ class DCB_Registry {
 			'rest'        => true,
 			'archive_page' => 0,
 			'layout'      => '',
+			'submit'       => false,
+			'submit_image' => false,
 		);
 	}
 
@@ -142,6 +144,8 @@ class DCB_Registry {
 			'rest'         => true,
 			'archive_page' => 0,
 			'layout'       => '',
+			'submit'       => false,
+			'submit_image' => false,
 		);
 		return array_merge( $defaults, array_intersect_key( $def, $defaults ) );
 	}
@@ -305,7 +309,7 @@ class DCB_Registry {
 			case 'textarea':
 				return sanitize_textarea_field( $raw );
 			case 'url':
-				return esc_url_raw( $raw );
+				return esc_url_raw( $raw, array( 'http', 'https' ) ); // No javascript:, data:, ftp: ...
 			case 'email':
 				return sanitize_email( $raw );
 			case 'number':
@@ -540,6 +544,9 @@ class DCB_Registry {
 			'rest'         => ! empty( $in['rest'] ),
 			'archive_page' => $archive_page,
 			'layout'       => $layout,
+			'submit'       => ! empty( $in['submit'] ),
+			// Image upload only makes sense (and is only allowed) if the CPT has a featured image.
+			'submit_image' => ! empty( $in['submit'] ) && ! empty( $in['submit_image'] ) && in_array( 'thumbnail', $supports, true ),
 		);
 	}
 

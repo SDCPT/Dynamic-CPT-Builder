@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Dynamic CPT Builder
  * Description:       Create custom post types, taxonomies and fields in the backend. No code, no custom database tables.
- * Version:           0.4.0
+ * Version:           0.5.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * License:           AGPL-3.0-or-later
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DCB_VERSION', '0.4.0' );
+define( 'DCB_VERSION', '0.5.0' );
 define( 'DCB_FILE', __FILE__ );
 define( 'DCB_PATH', plugin_dir_path( __FILE__ ) );
 
@@ -23,6 +23,8 @@ require_once DCB_PATH . 'includes/class-registry.php';
 require_once DCB_PATH . 'includes/class-i18n.php';
 require_once DCB_PATH . 'includes/class-design.php';
 require_once DCB_PATH . 'includes/class-archive.php';
+require_once DCB_PATH . 'includes/class-upload.php';
+require_once DCB_PATH . 'includes/class-submit.php';
 require_once DCB_PATH . 'includes/class-admin.php';
 require_once DCB_PATH . 'includes/class-metabox.php';
 require_once DCB_PATH . 'includes/class-frontend.php';
@@ -47,6 +49,7 @@ final class DCB_Plugin {
 		$registry->init();
 		( new DCB_I18n( $registry ) )->init();
 		( new DCB_Archive( $registry ) )->init();
+		( new DCB_Submit( $registry ) )->init();
 
 		if ( is_admin() ) {
 			( new DCB_Admin( $registry ) )->init();
