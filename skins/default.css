@@ -1,0 +1,9 @@
+/* Skin: Light */
+.dcb-skin-default {
+	--dcb-muted: #555;
+	--dcb-bg: #fafafa;
+	--dcb-border: #ddd;
+	--dcb-accent: #2563eb;
+	--dcb-radius: 6px;
+	--dcb-gap: 1rem;
+}

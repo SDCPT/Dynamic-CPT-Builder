@@ -1,0 +1,78 @@
+/* Dynamic CPT Builder: base styles. All look-and-feel comes from the --dcb-* variables (see skins/). */
+.dcb { color: var(--dcb-text, inherit); font-family: var(--dcb-font, inherit); }
+.dcb a { color: var(--dcb-accent, inherit); }
+
+/* Field box (definition list) */
+.dcb-fields {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: .35rem var(--dcb-gap, 1rem);
+	margin: 1.5rem 0;
+	padding: 1rem;
+	background: var(--dcb-bg, transparent);
+	border: 1px solid var(--dcb-border, #ddd);
+	border-radius: var(--dcb-radius, 6px);
+}
+.dcb-fields dt { margin: 0; font-weight: 600; color: var(--dcb-muted, inherit); }
+.dcb-fields dd { margin: 0; overflow-wrap: anywhere; }
+
+/* Entry lists: three clearly different layouts */
+.dcb-list { display: grid; gap: var(--dcb-gap, 1rem); }
+.dcb-item h3 { margin-top: 0; }
+.dcb-item .dcb-fields { margin: .75rem 0 0; padding: 0; background: none; border: 0; }
+
+/* list: plain rows separated by lines, no boxes */
+.dcb-layout-list { gap: 0; }
+.dcb-layout-list .dcb-item { padding: .9rem 0; border-bottom: 1px solid var(--dcb-border, #ddd); }
+.dcb-layout-list .dcb-item:last-child { border-bottom: 0; }
+
+/* cards: boxes in a responsive grid */
+.dcb-layout-cards { grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+.dcb-layout-cards .dcb-item {
+	padding: 1rem;
+	background: var(--dcb-bg, transparent);
+	border: 1px solid var(--dcb-border, #ddd);
+	border-radius: var(--dcb-radius, 6px);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+/* mosaic: image tiles of different sizes, title on top of the image */
+.dcb-layout-mosaic {
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+	grid-auto-rows: 10rem;
+	grid-auto-flow: dense;
+}
+.dcb-tile {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--dcb-radius, 6px);
+	background: var(--dcb-accent, #2563eb);
+}
+.dcb-tile:nth-child(5n + 1) { grid-column: span 2; grid-row: span 2; }
+.dcb-tile:nth-child(7n + 4) { grid-row: span 2; }
+.dcb-tile a { display: block; height: 100%; color: #fff; text-decoration: none; }
+.dcb-tile img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.dcb-tile a:hover img, .dcb-tile a:focus img { transform: scale(1.05); }
+.dcb-tile-title {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1.5rem .8rem .6rem;
+	font-weight: 600;
+	color: #fff;
+	background: linear-gradient(transparent, rgba(0, 0, 0, .75));
+}
+.dcb-tile-noimg { display: flex; align-items: flex-end; height: 100%; }
+.dcb-tile-noimg .dcb-tile-title { position: static; background: none; }
+
+/* pagination under a list */
+.dcb-pagination { margin-top: 1.5rem; }
+.dcb-pagination .page-numbers { display: inline-block; margin-right: .35rem; padding: .25rem .6rem; border: 1px solid var(--dcb-border, #ddd); border-radius: var(--dcb-radius, 6px); text-decoration: none; }
+.dcb-pagination .current { background: var(--dcb-accent, #2563eb); border-color: transparent; color: #fff; }
+
+@media (max-width: 480px) {
+	.dcb-fields { grid-template-columns: 1fr; }
+	.dcb-fields dd { margin-bottom: .5rem; }
+	.dcb-tile:nth-child(5n + 1), .dcb-tile:nth-child(7n + 4) { grid-column: auto; grid-row: auto; }
+}
