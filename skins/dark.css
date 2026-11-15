@@ -1,0 +1,10 @@
+/* Skin: Dark */
+.dcb-skin-dark {
+	--dcb-text: #e5e7eb;
+	--dcb-muted: #9ca3af;
+	--dcb-bg: #111827;
+	--dcb-border: #374151;
+	--dcb-accent: #60a5fa;
+	--dcb-radius: 8px;
+	--dcb-gap: 1rem;
+}

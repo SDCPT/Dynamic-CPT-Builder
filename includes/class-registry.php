@@ -15,6 +15,18 @@ class DCB_Registry {
 	const MAX_TAX    = 5;
 	const TYPES      = array( 'text', 'textarea', 'url', 'email', 'number', 'date', 'select', 'checkbox' );
 
+	const BASE_OPTION = 'dcb_base';
+	const LAYOUTS     = array( 'list', 'cards', 'mosaic' );
+
+	/** Words that would collide with WordPress' own URLs and cannot be used as URL base. */
+	const RESERVED_BASES = array( 'wp-admin', 'wp-content', 'wp-includes', 'wp-json', 'feed', 'admin', 'login', 'page', 'category', 'tag', 'author', 'search', 'embed', 'comments', 'trackback', 'attachment' );
+
+	/** WordPress features a CPT can switch on (post type "supports"). */
+	const SUPPORTS = array( 'title', 'editor', 'thumbnail', 'excerpt', 'author', 'comments', 'trackbacks', 'revisions', 'page-attributes', 'post-formats' );
+
+	/** WordPress' built-in taxonomies that can be attached to a CPT. */
+	const BUILTIN_TAX = array( 'category', 'post_tag' );
+
 	/** @var array|null */
 	private $defs = null;
 
@@ -56,9 +68,82 @@ class DCB_Registry {
 				array( 'key' => 'notes',      'label' => 'Notes',           'type' => 'textarea', 'options' => array() ),
 			),
 			'taxonomies' => array(
-				array( 'key' => 'bot_vendor', 'label' => 'Vendor' ),
+				array( 'key' => 'bot_vendor', 'label' => 'Vendor', 'hierarchical' => true ),
 			),
+			'supports'    => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+			'builtin_tax' => array(),
+			'hierarchical' => false,
+			'public'      => true,
+			'archive'     => true,
+			'rest'        => true,
+			'archive_page' => 0,
+			'layout'      => '',
 		);
+	}
+
+	/* ------------------------------------------------------------------
+	 * URL base and archive pages
+	 * ---------------------------------------------------------------- */
+
+	/** URL prefix for all CPTs, "p" by default. An empty string means no prefix. */
+	public static function base() {
+		return sanitize_title( (string) get_option( self::BASE_OPTION, 'p' ) );
+	}
+
+	/**
+	 * Cleans a user-entered URL base.
+	 *
+	 * @return string|null Clean base ("" is allowed) or null if the word is reserved by WordPress.
+	 */
+	public static function sanitize_base( $raw ) {
+		$base = sanitize_title( trim( (string) $raw, " \t\n\r/" ) );
+		return in_array( $base, self::RESERVED_BASES, true ) ? null : $base;
+	}
+
+	/** URL path of a CPT without slashes at the ends, e.g. "p/bots". */
+	public static function path_for( array $def ) {
+		$base = self::base();
+		return '' === $base ? $def['slug'] : $base . '/' . $def['slug'];
+	}
+
+	/** ID of the WordPress page that serves as archive page of this CPT, or 0 if none / not usable. */
+	public static function archive_page_id( array $def ) {
+		$o  = self::opts( $def );
+		$id = (int) $o['archive_page'];
+		if ( $id < 1 || ! $o['public'] ) {
+			return 0;
+		}
+		return ( 'page' === get_post_type( $id ) && 'publish' === get_post_status( $id ) ) ? $id : 0;
+	}
+
+	/** Key of the CPT whose archive page is $page_id, or null. */
+	public function archive_owner( $page_id ) {
+		$page_id = (int) $page_id;
+		foreach ( $this->all() as $key => $def ) {
+			if ( (int) self::opts( $def )['archive_page'] === $page_id && self::archive_page_id( $def ) === $page_id ) {
+				return $key;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Feature switches of a definition, with defaults for definitions saved by older versions.
+	 *
+	 * @return array{supports:string[],builtin_tax:string[],hierarchical:bool,public:bool,archive:bool,rest:bool}
+	 */
+	public static function opts( array $def ) {
+		$defaults = array(
+			'supports'     => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+			'builtin_tax'  => array(),
+			'hierarchical' => false,
+			'public'       => true,
+			'archive'      => true,
+			'rest'         => true,
+			'archive_page' => 0,
+			'layout'       => '',
+		);
+		return array_merge( $defaults, array_intersect_key( $def, $defaults ) );
 	}
 
 	/* ------------------------------------------------------------------
@@ -108,6 +193,7 @@ class DCB_Registry {
 
 			$plural   = DCB_I18n::t( $def['plural'], DCB_I18n::name( $key, 'plural' ) );
 			$singular = DCB_I18n::t( $def['singular'], DCB_I18n::name( $key, 'singular' ) );
+			$o        = self::opts( $def );
 
 			register_post_type(
 				$key,
@@ -119,13 +205,21 @@ class DCB_Registry {
 						'edit_item'     => sprintf( __( 'Edit %s', 'dcb' ), $singular ),
 						'all_items'     => $plural,
 					),
-					'public'       => true,
-					'has_archive'  => true,
-					'show_in_rest' => true,
-					'menu_icon'    => $def['icon'],
-					'supports'     => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ),
-					'rewrite'      => array(
-						'slug'       => $def['slug'],
+					'public'              => (bool) $o['public'],
+					'publicly_queryable'  => (bool) $o['public'],
+					'exclude_from_search' => ! $o['public'],
+					'show_ui'             => true,
+					'show_in_menu'        => true,
+					// With an archive page the page is the archive, so WordPress must not build a second one.
+					'has_archive'         => $o['public'] && $o['archive'] && ! self::archive_page_id( $def ),
+					'hierarchical'        => (bool) $o['hierarchical'],
+					'show_in_rest'        => (bool) $o['rest'],
+					'menu_icon'           => $def['icon'],
+					// "custom-fields" is required for the meta fields to appear in the REST API.
+					'supports'            => array_merge( $o['supports'], array( 'custom-fields' ) ),
+					'taxonomies'          => $o['builtin_tax'],
+					'rewrite'             => array(
+						'slug'       => self::path_for( $def ),
 						'with_front' => false,
 					),
 				)
@@ -140,8 +234,8 @@ class DCB_Registry {
 					$key,
 					array(
 						'label'             => DCB_I18n::t( $tax['label'], DCB_I18n::name( $key, 'tax', $tax['key'], 'label' ) ),
-						'hierarchical'      => true,
-						'public'            => true,
+						'hierarchical'      => ! isset( $tax['hierarchical'] ) || $tax['hierarchical'],
+						'public'            => (bool) $o['public'],
 						'show_in_rest'      => true,
 						'show_admin_column' => true,
 						'rewrite'           => array( 'slug' => $tax['key'] ),
@@ -171,6 +265,11 @@ class DCB_Registry {
 
 	/** Rewrite rules are flushed only after a definition changed. */
 	public function maybe_flush() {
+		// After a plugin update the URL structure may have changed, so flush once per version.
+		if ( get_option( 'dcb_version' ) !== DCB_VERSION ) {
+			update_option( 'dcb_version', DCB_VERSION, true );
+			update_option( self::FLUSH, 1, false );
+		}
 		if ( get_option( self::FLUSH ) ) {
 			flush_rewrite_rules( false );
 			delete_option( self::FLUSH );
@@ -302,7 +401,9 @@ class DCB_Registry {
 		return $fields;
 	}
 
-	/** Line format: key|Label */
+	/**
+	 * Line format: key|Label|kind   (kind: "category" = hierarchical, default; "tags" = flat like tags)
+	 */
 	public function parse_taxonomies( $text, $cpt_key, array &$errors ) {
 		$taxes = array();
 		$seen  = array();
@@ -316,7 +417,12 @@ class DCB_Registry {
 			$parts = array_map( 'trim', explode( '|', $line ) );
 			$key   = substr( sanitize_key( $parts[0] ), 0, 32 );
 			$label = sanitize_text_field( isset( $parts[1] ) ? $parts[1] : '' );
+			$kind  = isset( $parts[2] ) && '' !== $parts[2] ? strtolower( $parts[2] ) : 'category';
 
+			if ( ! in_array( $kind, array( 'category', 'tags' ), true ) ) {
+				$errors[] = sprintf( __( 'Taxonomies, line %1$d: unknown kind "%2$s" (use "category" or "tags").', 'dcb' ), $n, $kind );
+				continue;
+			}
 			if ( '' === $key || isset( $seen[ $key ] ) ) {
 				$errors[] = sprintf( __( 'Taxonomies, line %d: key is missing or duplicated.', 'dcb' ), $n );
 				continue;
@@ -328,8 +434,9 @@ class DCB_Registry {
 			}
 			$seen[ $key ] = true;
 			$taxes[]      = array(
-				'key'   => $key,
-				'label' => '' !== $label ? $label : $key,
+				'key'          => $key,
+				'label'        => '' !== $label ? $label : $key,
+				'hierarchical' => 'tags' !== $kind,
 			);
 		}
 
@@ -390,6 +497,29 @@ class DCB_Registry {
 		$fields = $this->parse_fields( isset( $in['fields'] ) ? $in['fields'] : '', $errors );
 		$taxes  = $this->parse_taxonomies( isset( $in['taxonomies'] ) ? $in['taxonomies'] : '', $key, $errors );
 
+		// Feature switches: whitelist everything, never trust the form.
+		$supports     = $this->whitelist( isset( $in['supports'] ) ? $in['supports'] : array(), self::SUPPORTS );
+		$builtin_tax  = $this->whitelist( isset( $in['builtin_tax'] ) ? $in['builtin_tax'] : array(), self::BUILTIN_TAX );
+		$hierarchical = ! empty( $in['hierarchical'] );
+		if ( $hierarchical && ! in_array( 'page-attributes', $supports, true ) ) {
+			$supports[] = 'page-attributes'; // Needed for the "parent" selector.
+		}
+
+		$archive_page = isset( $in['archive_page'] ) ? absint( $in['archive_page'] ) : 0;
+		if ( $archive_page ) {
+			if ( 'page' !== get_post_type( $archive_page ) ) {
+				$errors[] = __( 'The archive page must be a normal WordPress page.', 'dcb' );
+			} else {
+				foreach ( $all as $other_key => $other ) {
+					if ( $other_key !== $key && (int) self::opts( $other )['archive_page'] === $archive_page ) {
+						$errors[] = __( 'This page is already the archive page of another CPT.', 'dcb' );
+						break;
+					}
+				}
+			}
+		}
+		$layout = isset( $in['layout'] ) && in_array( $in['layout'], self::LAYOUTS, true ) ? $in['layout'] : '';
+
 		if ( $errors ) {
 			return null;
 		}
@@ -402,7 +532,21 @@ class DCB_Registry {
 			'icon'       => $icon,
 			'fields'     => $fields,
 			'taxonomies' => $taxes,
+			'supports'     => $supports,
+			'builtin_tax'  => $builtin_tax,
+			'hierarchical' => $hierarchical,
+			'public'       => ! empty( $in['public'] ),
+			'archive'      => ! empty( $in['archive'] ),
+			'rest'         => ! empty( $in['rest'] ),
+			'archive_page' => $archive_page,
+			'layout'       => $layout,
 		);
+	}
+
+	/** Keeps only known values from a submitted list, in the order of the whitelist. */
+	private function whitelist( $submitted, array $allowed ) {
+		$submitted = is_array( $submitted ) ? array_map( 'strval', $submitted ) : array();
+		return array_values( array_intersect( $allowed, $submitted ) );
 	}
 
 	/** Reverse: fields as text lines for the form. */
@@ -424,7 +568,11 @@ class DCB_Registry {
 	public static function taxonomies_to_text( array $taxes ) {
 		$lines = array();
 		foreach ( $taxes as $t ) {
-			$lines[] = $t['key'] . '|' . $t['label'];
+			$line = $t['key'] . '|' . $t['label'];
+			if ( isset( $t['hierarchical'] ) && ! $t['hierarchical'] ) {
+				$line .= '|tags';
+			}
+			$lines[] = $line;
 		}
 		return implode( "\n", $lines );
 	}

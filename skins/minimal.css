@@ -1,0 +1,9 @@
+/* Skin: Minimal */
+.dcb-skin-minimal {
+	--dcb-muted: inherit;
+	--dcb-bg: transparent;
+	--dcb-border: transparent;
+	--dcb-accent: currentColor;
+	--dcb-radius: 0px;
+	--dcb-gap: 1rem;
+}

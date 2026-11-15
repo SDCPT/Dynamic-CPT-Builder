@@ -23,6 +23,8 @@ class DCB_Metabox {
 
 	public function add() {
 		foreach ( $this->registry->all() as $key => $def ) {
+			// "custom-fields" support is needed for REST, but the raw meta box would only duplicate our fields.
+			remove_meta_box( 'postcustom', $key, 'normal' );
 			if ( empty( $def['fields'] ) ) {
 				continue;
 			}

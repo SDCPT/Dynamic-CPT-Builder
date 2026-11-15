@@ -10,3 +10,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 delete_option( 'dcb_definitions' );
 delete_option( 'dcb_flush_needed' );
+delete_option( 'dcb_settings' );
+delete_option( 'dcb_base' );
+delete_option( 'dcb_version' );
